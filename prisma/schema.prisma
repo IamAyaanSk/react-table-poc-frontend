@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LedgerType {
+  CREDIT
+  DEBIT
+}
+
+enum LedgerPurpose {
+  WALLET
+  FUND_REQUEST
+  SERVICE
+  COMMISION
+  SURCHARGE
+  REFUND
+  }
+
+model Ledger {
+  id              String   @id @default(uuid()) 
+  amount          Float
+  openingBalance  Float
+  closingBalance  Float
+  dateTime        DateTime
+  type            LedgerType
+  purpose         LedgerPurpose
+  service         String
+  transferredTo   String?
+  description     String?
+  referenceId     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([dateTime])
+  @@index([referenceId])
+  @@index([type])
+  @@index([purpose])
+
+  @@map("ledger") 
+}
