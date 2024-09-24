@@ -37,6 +37,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       const dateTime = row.original.dateTime.toLocaleString();
       return <span>{dateTime}</span>;
     },
+    enableSorting: false,
   },
   {
     accessorKey: "type",
@@ -45,6 +46,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       const type = row.original.type;
       return <span>{type}</span>;
     },
+    enableSorting: false,
   },
   {
     accessorKey: "purpose",
@@ -53,6 +55,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       const purpose = row.original.purpose;
       return <span>{purpose}</span>;
     },
+    enableSorting: false,
   },
   {
     accessorKey: "service",
@@ -61,6 +64,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       const service = row.original.service;
       return <span>{service}</span>;
     },
+    enableSorting: false,
   },
   {
     accessorKey: "transferredTo",
@@ -69,6 +73,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       const transferredTo = row.original.transferredTo;
       return <span>{transferredTo}</span>;
     },
+    enableSorting: false,
   },
   {
     accessorKey: "description",
@@ -77,6 +82,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       const description = row.original.description;
       return <span>{description}</span>;
     },
+    enableSorting: false,
   },
   {
     accessorKey: "referenceId",
@@ -85,5 +91,6 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       const referenceId = row.original.referenceId;
       return <span>{referenceId}</span>;
     },
+    enableSorting: false,
   },
 ];
