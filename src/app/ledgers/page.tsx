@@ -22,49 +22,58 @@ export default async function WalletLedgerTable({
 
   return (
     <DataTable
-      columns={columns}
-      data={data}
-      totalRecords={totalRecords}
-      filterOptiions={{
-        type: {
-          options: [
-            {
-              label: "Credit",
-              value: "CREDIT",
-            },
-            {
-              label: "Debit",
-              value: "DEBIT",
-            },
-          ],
-        },
-        purpose: {
-          options: [
-            {
-              label: "Wallet",
-              value: "WALLET",
-            },
-            {
-              label: "Fund Request",
-              value: "FUND_REQUEST",
-            },
-            {
-              label: "Service",
-              value: "SERVICE",
-            },
-            {
-              label: "Comission",
-              value: "COMMISION",
-            },
-            {
-              label: "Refund",
-              value: "REFUND",
-            },
-            {
-              label: "Surcharge",
-              value: "SURCHARGE",
-            },
-          ],
+      config={{
+        columns,
+        data,
+        totalRecords,
+        filterOptions: {
+          type: {
+            options: [
+              {
+                label: "Credit",
+                value: "CREDIT",
+              },
+              {
+                label: "Debit",
+                value: "DEBIT",
+              },
+            ],
+            variant: "faceted",
+          },
+          purpose: {
+            options: [
+              {
+                label: "Wallet",
+                value: "WALLET",
+              },
+              {
+                label: "Fund Request",
+                value: "FUND_REQUEST",
+              },
+              {
+                label: "Service",
+                value: "SERVICE",
+              },
+              {
+                label: "Comission",
+                value: "COMMISION",
+              },
+              {
+                label: "Refund",
+                value: "REFUND",
+              },
+              {
+                label: "Surcharge",
+                value: "SURCHARGE",
+              },
+            ],
+            variant: "faceted",
+          },
+
+          reference_id: {
+            placeholder: "Search by Reference ID",
+            variant: "searchBox",
+          },
         },
       }}
     />

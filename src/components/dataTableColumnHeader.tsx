@@ -2,6 +2,7 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   CaretSortIcon,
+  EyeNoneIcon,
 } from "@radix-ui/react-icons";
 import { Column, SortingState } from "@tanstack/react-table";
 
@@ -29,10 +30,9 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
   setSortting,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  if (!column.getCanSort()) {
-    return <div className={cn(className)}>{children}</div>;
+  if (!column.getCanSort() && !column.getCanHide()) {
+    return <span>{children}</span>;
   }
-
   const handleSortingState = (desc: boolean) => {
     setSortting((prev) => {
       const newSorting = prev.filter((sort) => sort.id !== column.id);
@@ -67,24 +67,34 @@ export function DataTableColumnHeader<TData, TValue>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => handleSortingState(false)}>
-            <ArrowUpIcon className="mr-2 h-3.5 w-3.5" />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleSortingState(true)}>
-            <ArrowDownIcon className="mr-2 h-3.5 w-3.5" />
-            Desc
-          </DropdownMenuItem>
-
-          {column.getIsSorted() && (
+          {column.getCanSort() && (
             <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => removeSorting()}>
-                Reset
+              <DropdownMenuItem onClick={() => handleSortingState(false)}>
+                <ArrowUpIcon className="mr-2 h-3.5 w-3.5" />
+                Asc
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortingState(true)}>
+                <ArrowDownIcon className="mr-2 h-3.5 w-3.5" />
+                Desc
+              </DropdownMenuItem>
+
+              {column.getIsSorted() && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => removeSorting()}>
+                    Unsort
+                  </DropdownMenuItem>
+                </>
+              )}
+              <DropdownMenuSeparator />
             </>
           )}
-          <DropdownMenuSeparator />
+          {column.getCanHide() && (
+            <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+              <EyeNoneIcon className="mr-2 h-3.5 w-3.5" />
+              Hide
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

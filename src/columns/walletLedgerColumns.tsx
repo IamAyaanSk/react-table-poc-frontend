@@ -1,5 +1,6 @@
 "use client";
 
+import { getIstString } from "@/lib/utils";
 import { Ledger } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -34,8 +35,11 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     accessorKey: "dateTime",
     header: "Date | Time",
     cell: ({ row }) => {
-      const dateTime = row.original.dateTime.toLocaleString();
-      return <span>{dateTime}</span>;
+      const dateObject =
+        typeof row.original.dateTime === "string"
+          ? new Date(row.original.dateTime)
+          : row.original.dateTime;
+      return <span>{getIstString(dateObject)}</span>;
     },
     enableSorting: false,
   },

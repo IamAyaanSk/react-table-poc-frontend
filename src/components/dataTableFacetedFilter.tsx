@@ -31,6 +31,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
     icon?: React.ComponentType<{ className?: string }>;
   }[];
   setFilter: React.Dispatch<React.SetStateAction<ColumnFilter[]>>;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
@@ -38,8 +39,8 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
   setFilter,
+  setPage,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  //   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
 
   return (
@@ -100,6 +101,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       } else {
                         selectedValues.add(option.value);
                       }
+                      setPage(1);
                       setFilter((prev) => {
                         const newFilter = prev.filter(
                           (filter) => filter.id !== column?.id
@@ -137,11 +139,12 @@ export function DataTableFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() =>
+                    onSelect={() => {
+                      setPage(1);
                       setFilter((prev) =>
                         prev.filter((filter) => filter.id !== column?.id)
-                      )
-                    }
+                      );
+                    }}
                     className="justify-center text-center"
                   >
                     Clear filters
