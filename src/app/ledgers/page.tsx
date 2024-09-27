@@ -1,5 +1,5 @@
 import { columns } from "@/columns/walletLedgerColumns";
-import { DataTable } from "@/components/dataTable";
+import { DataTable } from "@/components/data-table/dataTable";
 import { API_PATHS } from "@/constants/apiPaths";
 
 export default async function WalletLedgerTable({
@@ -26,6 +26,7 @@ export default async function WalletLedgerTable({
         columns,
         data,
         totalRecords,
+        pageSizes: [100, 200, 500],
         filterOptions: {
           type: {
             options: [
@@ -70,7 +71,7 @@ export default async function WalletLedgerTable({
             variant: "faceted",
           },
 
-          reference_id: {
+          referenceId: {
             placeholder: "Search by Reference ID",
             variant: "searchBox",
           },

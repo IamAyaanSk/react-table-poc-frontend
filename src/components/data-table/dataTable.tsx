@@ -35,10 +35,14 @@ import DataTableSearchBox from "./dataTableSearchBox";
 import { DataTableDatePicker } from "./dataTableDatePicker";
 import { DateRange } from "react-day-picker";
 import DataTableViewController from "./dataTableViewController";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import saveAs from "file-saver";
 import { toast } from "sonner";
 import { FileSpreadsheet } from "lucide-react";
+
+type OptionalFilterOptions<T> = {
+  [K in keyof T]?: FilterOptionsConfig;
+};
 
 type FacetedFilterOptions = {
   label: string;
@@ -59,7 +63,9 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     totalRecords: number;
-    filterOptions?: Record<string, FilterOptionsConfig>;
+    pageSizes: number[];
+    defaultPageSize?: number;
+    filterOptions?: OptionalFilterOptions<TData>;
     showDateRange?: boolean;
     allowExport?: boolean;
     showViewControlButton?: boolean;
@@ -72,6 +78,8 @@ export function DataTable<TData, TValue>({
     data,
     totalRecords,
     filterOptions,
+    pageSizes,
+    defaultPageSize = pageSizes[0],
     showDateRange = true,
     allowExport = true,
     showViewControlButton = true,
@@ -84,7 +92,7 @@ export function DataTable<TData, TValue>({
 
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1"));
   const [pageSize, setPageSize] = useState(
-    parseInt(searchParams.get("page_size") || "10")
+    parseInt(searchParams.get("page_size") || defaultPageSize.toString())
   );
   const [sorting, setSorting] = useState<SortingState>(
     getCurrentSortingOrderArray(searchParams.get("sort_by") || "")
@@ -141,9 +149,6 @@ export function DataTable<TData, TValue>({
       return acc;
     }, {} as Record<string, string>);
 
-    console.log(filterQueryParams);
-    console.log(filter);
-
     setQueryParams({
       page: String(page),
       page_size: String(pageSize),
@@ -160,6 +165,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     manualSorting: true,
+    manualFiltering: true,
     rowCount: totalRecords,
     state: {
       pagination: {
@@ -227,11 +233,9 @@ export function DataTable<TData, TValue>({
         {filterOptions && (
           <div>
             {Object.keys(filterOptions).map((key) => {
-              const filterConfig = filterOptions[key];
-              const isFaceted = filterConfig.variant === "faceted";
-              const isSearchBox = filterConfig.variant === "searchBox";
+              const filterConfig = filterOptions[key as keyof TData];
 
-              if (isFaceted) {
+              if (filterConfig?.variant === "faceted") {
                 return (
                   <DataTableFacetedFilter
                     key={key}
@@ -244,7 +248,7 @@ export function DataTable<TData, TValue>({
                 );
               }
 
-              if (isSearchBox) {
+              if (filterConfig?.variant === "searchBox") {
                 return (
                   <DataTableSearchBox
                     key={key}
@@ -327,6 +331,7 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination
         table={table}
+        pageSizes={pageSizes}
         page={page}
         pageSize={pageSize}
         setPage={setPage}
@@ -342,6 +347,6 @@ export function DataTable<TData, TValue>({
 // Handle hidden columns // Completed
 // Add export button // Completed
 // Add reset filters button // Completed
-// Improve data table option types
+// Improve data table option types // Completed
 // Improve UI
 // Add proper loading and empty state

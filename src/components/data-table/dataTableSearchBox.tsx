@@ -2,7 +2,7 @@
 
 import useDebounce from "@/hooks/useDebounce";
 import { ColumnFilter, FilterOptionsConfig } from "./dataTable";
-import { Input } from "./ui/input";
+import { Input } from "../ui/input";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 

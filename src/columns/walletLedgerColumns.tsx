@@ -4,7 +4,10 @@ import { getIstString } from "@/lib/utils";
 import { Ledger } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 
-type WalletLedgerTableRecord = Omit<Ledger, "id" | "createdAt" | "updatedAt">;
+export type WalletLedgerTableRecord = Omit<
+  Ledger,
+  "id" | "createdAt" | "updatedAt"
+>;
 
 export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
   {

@@ -1,9 +1,10 @@
 import { Table } from "@tanstack/react-table";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Dispatch, SetStateAction } from "react";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  pageSizes: number[];
   setPage: Dispatch<SetStateAction<number>>;
   setPageSize: Dispatch<SetStateAction<number>>;
   page: number;
@@ -12,6 +13,7 @@ interface DataTablePaginationProps<TData> {
 
 export default function DataTablePagination<TData>({
   table,
+  pageSizes,
   setPage,
   setPageSize,
   page,
@@ -50,7 +52,7 @@ export default function DataTablePagination<TData>({
           handlePageLimitChange(parseInt(e.target.value));
         }}
       >
-        {[10, 20, 30, 40, 50].map((pageSize) => (
+        {pageSizes.map((pageSize) => (
           <option key={pageSize} value={pageSize}>
             {pageSize}
           </option>
