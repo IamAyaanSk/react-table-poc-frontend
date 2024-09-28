@@ -156,12 +156,26 @@ export function DataTable<TData, TValue>({
   );
 
   useEffect(() => {
+    if (isPending) {
+      if (!loadingToastId.current) {
+        loadingToastId.current = toast.loading("Fetching data", {
+          closeButton: false,
+        });
+      }
+    } else {
+      if (loadingToastId.current) {
+        toast.dismiss(loadingToastId.current);
+        loadingToastId.current = null;
+      }
+    }
+
     return () => {
       if (loadingToastId.current) {
         toast.dismiss(loadingToastId.current);
+        loadingToastId.current = null;
       }
     };
-  }, [isPending, loadingToastId]);
+  }, [isPending]);
 
   useEffect(() => {
     console.log(dateRange);
@@ -173,10 +187,6 @@ export function DataTable<TData, TValue>({
       }
       return acc;
     }, {} as Record<string, string>);
-
-    loadingToastId.current = toast.loading("Fetching data", {
-      closeButton: false,
-    });
 
     setQueryParams({
       page: String(page),
