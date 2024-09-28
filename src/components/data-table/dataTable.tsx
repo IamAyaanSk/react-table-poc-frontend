@@ -161,7 +161,7 @@ export function DataTable<TData, TValue>({
         toast.dismiss(loadingToastId.current);
       }
     };
-  }, [isPending]);
+  }, [isPending, loadingToastId]);
 
   useEffect(() => {
     console.log(dateRange);
