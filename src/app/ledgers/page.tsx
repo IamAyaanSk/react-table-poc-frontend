@@ -26,7 +26,7 @@ export default async function WalletLedgerTable({
         columns,
         data,
         totalRecords,
-        pageSizes: [100, 200, 500],
+        pageSizes: [10, 20, 50],
         filterOptions: {
           type: {
             options: [

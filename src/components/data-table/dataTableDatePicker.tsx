@@ -18,7 +18,6 @@ export function DataTableDatePicker({
   currDateQueryParams,
   setPage,
 }: React.HTMLAttributes<HTMLDivElement> & {
-  date: DateRange;
   currDateQueryParams: DateRange;
   setDateQueryParams: React.Dispatch<React.SetStateAction<DateRange>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
@@ -53,9 +52,8 @@ export function DataTableDatePicker({
         <PopoverTrigger asChild>
           <Button
             id="date"
-            variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "w-[250px] justify-start text-left font-normal",
               !date && "text-muted-foreground"
             )}
           >
@@ -84,6 +82,7 @@ export function DataTableDatePicker({
             max={20}
           />
           <Button
+            className="text-xs mx-2 h-8 mb-4"
             disabled={
               !(date?.from && date?.to) ||
               checkDateRangesForEquality(date, currDateQueryParams)
@@ -97,6 +96,7 @@ export function DataTableDatePicker({
             Search
           </Button>
           <Button
+            className="text-xs m-2 h-8 mb-4"
             variant="outline"
             disabled={checkDateRangesForEquality(date, currDateQueryParams)}
             onClick={() => setDate(currDateQueryParams)}

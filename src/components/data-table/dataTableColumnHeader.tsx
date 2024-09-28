@@ -54,15 +54,15 @@ export function DataTableColumnHeader<TData, TValue>({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-3 h-8 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
+            className="-ml-3 text-sm text-black h-8 data-[state=open]:bg-primary/10 data-[state=open]:text-accent-foreground hover:bg-primary/10"
           >
             <span>{children}</span>
             {column.getIsSorted() === "desc" ? (
-              <ArrowDownIcon className="ml-2 h-4 w-4" />
+              <ArrowDownIcon className="text-primary ml-2 h-4 w-4" />
             ) : column.getIsSorted() === "asc" ? (
-              <ArrowUpIcon className="ml-2 h-4 w-4" />
+              <ArrowUpIcon className="text-primary ml-2 h-4 w-4" />
             ) : (
-              <CaretSortIcon className="ml-2 h-4 w-4" />
+              <CaretSortIcon className="text-primary ml-2 h-4 w-4" />
             )}
           </Button>
         </DropdownMenuTrigger>

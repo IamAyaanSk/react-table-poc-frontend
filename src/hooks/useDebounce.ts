@@ -1,18 +1,15 @@
 import { useEffect, useRef } from "react";
 
-const useDebounce = <T extends (...args: any[]) => void>(
-  callback: T,
-  delay: number
-) => {
+const useDebounce = (callback: (dataString: string) => void, delay: number) => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const debouncedFunction = (...args: Parameters<T>) => {
+  const debouncedFunction = (dataString: string) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
 
     timerRef.current = setTimeout(() => {
-      callback(...args);
+      callback(dataString);
     }, delay);
   };
 

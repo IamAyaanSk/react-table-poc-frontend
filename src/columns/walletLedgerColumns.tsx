@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { getIstString } from "@/lib/utils";
 import { Ledger } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
@@ -15,7 +16,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Amount",
     cell: ({ row }) => {
       const amount = row.original.amount;
-      return <span>{amount}</span>;
+      return <p className="text-right mr-10">₹{amount}</p>;
     },
   },
   {
@@ -23,7 +24,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Opening Balance",
     cell: ({ row }) => {
       const openingBalance = row.original.openingBalance;
-      return <span>{openingBalance}</span>;
+      return <p className="text-right mr-10">₹{openingBalance.toFixed(2)}</p>;
     },
   },
   {
@@ -31,7 +32,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Closing Balance",
     cell: ({ row }) => {
       const closingBalance = row.original.closingBalance;
-      return <span>{closingBalance}</span>;
+      return <p className="text-right mr-10">₹{closingBalance.toFixed(2)}</p>;
     },
   },
   {
@@ -42,7 +43,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
         typeof row.original.dateTime === "string"
           ? new Date(row.original.dateTime)
           : row.original.dateTime;
-      return <span>{getIstString(dateObject)}</span>;
+      return <p>{getIstString(dateObject)}</p>;
     },
     enableSorting: false,
   },
@@ -51,7 +52,17 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Type",
     cell: ({ row }) => {
       const type = row.original.type;
-      return <span>{type}</span>;
+      return (
+        <Badge
+          className={`${
+            type === "CREDIT"
+              ? "bg-green-200 hover:bg-green-200"
+              : "bg-red-200 hover:bg-red-200"
+          } text-xs text-gray-600`}
+        >
+          {type}
+        </Badge>
+      );
     },
     enableSorting: false,
   },
@@ -60,7 +71,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Purpose",
     cell: ({ row }) => {
       const purpose = row.original.purpose;
-      return <span>{purpose}</span>;
+      return <p>{purpose}</p>;
     },
     enableSorting: false,
   },
@@ -69,7 +80,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Service",
     cell: ({ row }) => {
       const service = row.original.service;
-      return <span>{service}</span>;
+      return <p>{service}</p>;
     },
     enableSorting: false,
   },
@@ -78,7 +89,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Transferred To",
     cell: ({ row }) => {
       const transferredTo = row.original.transferredTo;
-      return <span>{transferredTo}</span>;
+      return <p>{transferredTo}</p>;
     },
     enableSorting: false,
   },
@@ -87,7 +98,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Description",
     cell: ({ row }) => {
       const description = row.original.description;
-      return <span>{description}</span>;
+      return <p>{description}</p>;
     },
     enableSorting: false,
   },
@@ -96,7 +107,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Reference Id",
     cell: ({ row }) => {
       const referenceId = row.original.referenceId;
-      return <span>{referenceId}</span>;
+      return <p>{referenceId}</p>;
     },
     enableSorting: false,
   },

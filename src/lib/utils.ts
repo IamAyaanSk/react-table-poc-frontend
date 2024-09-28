@@ -182,3 +182,9 @@ export async function htmlTableToExcelFileBuffer(
     return false;
   }
 }
+
+export function isValidDate(dateString: string | null) {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+}

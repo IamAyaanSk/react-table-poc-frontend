@@ -32,12 +32,14 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   }[];
   setFilter: React.Dispatch<React.SetStateAction<ColumnFilter[]>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
+  className?: string;
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  className,
   setFilter,
   setPage,
 }: DataTableFacetedFilterProps<TData, TValue>) {
@@ -46,15 +48,19 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn("h-8 border-dashed", className)}
+        >
           <PlusCircledIcon className="mr-2 h-4 w-4" />
-          {title}
+          <span className=" capitalize">{title}</span>
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <Badge
                 variant="secondary"
-                className="rounded-sm px-1 font-normal lg:hidden"
+                className="rounded-sm px-1 font-normal bg-primary/10 hover:bg-primary/10 lg:hidden"
               >
                 {selectedValues.size}
               </Badge>
@@ -62,7 +68,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 {selectedValues.size > 2 ? (
                   <Badge
                     variant="secondary"
-                    className="rounded-sm px-1 font-normal"
+                    className="rounded-sm px-1 font-normal bg-primary/10 hover:bg-primary/10"
                   >
                     {selectedValues.size} selected
                   </Badge>
@@ -73,7 +79,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <Badge
                         variant="secondary"
                         key={option.value}
-                        className="rounded-sm px-1 font-normal"
+                        className="rounded-sm px-1 font-normal bg-primary/10 hover:bg-primary/10"
                       >
                         {option.label}
                       </Badge>
@@ -86,7 +92,7 @@ export function DataTableFacetedFilter<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
-          <CommandInput placeholder={title} />
+          <CommandInput className=" capitalize" placeholder={title} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>

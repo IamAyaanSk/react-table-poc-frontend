@@ -20,12 +20,13 @@ import {
 
 import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import DataTablePagination from "./dataTablePagination";
 import {
   getCurrentSortingOrderArray,
   getCurrentSortingOrderParamString,
   htmlTableToExcelFileBuffer,
+  isValidDate,
   setStartAndEndOfDay,
 } from "@/lib/utils";
 
@@ -39,6 +40,8 @@ import { Button } from "../ui/button";
 import saveAs from "file-saver";
 import { toast } from "sonner";
 import { FileSpreadsheet } from "lucide-react";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Separator } from "@/components/ui/separator";
 
 type OptionalFilterOptions<T> = {
   [K in keyof T]?: FilterOptionsConfig;
@@ -90,6 +93,9 @@ export function DataTable<TData, TValue>({
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const [isPending, startTransition] = useTransition();
+  const loadingToastId = useRef<number | string | null>(null);
+
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1"));
   const [pageSize, setPageSize] = useState(
     parseInt(searchParams.get("page_size") || defaultPageSize.toString())
@@ -97,9 +103,19 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>(
     getCurrentSortingOrderArray(searchParams.get("sort_by") || "")
   );
+
+  const queryParamsFromDate = searchParams.get("from_date");
+  const queryParamsToDate = searchParams.get("to_date");
+
   const currDate: DateRange = setStartAndEndOfDay({
-    from: new Date(searchParams.get("from_date") || new Date()),
-    to: new Date(searchParams.get("to_date") || new Date()),
+    from:
+      queryParamsFromDate && isValidDate(queryParamsFromDate)
+        ? new Date(queryParamsFromDate)
+        : new Date(),
+    to:
+      queryParamsToDate && isValidDate(queryParamsToDate)
+        ? new Date(queryParamsToDate)
+        : new Date(),
   });
 
   const [dateRange, setDateRange] = useState<DateRange>(currDate);
@@ -132,11 +148,20 @@ export function DataTable<TData, TValue>({
           newParams.set(key, value);
         }
       }
-
-      router.push(`${pathname}?${newParams.toString()}`);
+      startTransition(() => {
+        router.push(`${pathname}?${newParams.toString()}`);
+      });
     },
     [router, pathname]
   );
+
+  useEffect(() => {
+    return () => {
+      if (loadingToastId.current) {
+        toast.dismiss(loadingToastId.current);
+      }
+    };
+  }, [isPending]);
 
   useEffect(() => {
     console.log(dateRange);
@@ -149,6 +174,10 @@ export function DataTable<TData, TValue>({
       return acc;
     }, {} as Record<string, string>);
 
+    loadingToastId.current = toast.loading("Fetching data", {
+      closeButton: false,
+    });
+
     setQueryParams({
       page: String(page),
       page_size: String(pageSize),
@@ -157,7 +186,7 @@ export function DataTable<TData, TValue>({
       from_date: dateRange?.from?.toISOString() as string,
       to_date: dateRange?.to?.toISOString() as string,
     });
-  }, [page, pageSize, sorting, filter, dateRange]);
+  }, [page, pageSize, sorting, filter, dateRange, setQueryParams]);
 
   const table = useReactTable({
     data: data,
@@ -202,86 +231,108 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div>
-      {allowExport && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button onClick={handleExport} size="sm" className="h-8 flex">
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            Export
+    <div className="m-4 border border-primary px-6 rounded-md pb-6">
+      <div className="flex flex-col gap-2 justify-center pt-6 pb-4">
+        <div className="flex justify-between items-center">
+          {showDateRange && (
+            <div>
+              <DataTableDatePicker
+                setDateQueryParams={setDateRange}
+                currDateQueryParams={dateRange}
+                setPage={setPage}
+              />
+            </div>
+          )}
+          <div className="flex gap-4 items-center">
+            {allowExport && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button onClick={handleExport} size="sm" className="h-8 flex">
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+              </div>
+            )}
+
+            {showViewControlButton && (
+              <div>
+                <DataTableViewController table={table} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {filterOptions && (
+            <>
+              {Object.keys(filterOptions).map((key) => {
+                const filterConfig = filterOptions[key as keyof TData];
+
+                if (filterConfig?.variant === "faceted") {
+                  return (
+                    <DataTableFacetedFilter
+                      className="order-2"
+                      key={key}
+                      title={key}
+                      options={filterConfig.options}
+                      setFilter={setFilter}
+                      setPage={setPage}
+                      column={table.getColumn(key)}
+                    />
+                  );
+                }
+
+                if (filterConfig?.variant === "searchBox") {
+                  return (
+                    <DataTableSearchBox
+                      className="order-1"
+                      key={key}
+                      filterForId={key}
+                      filterOptionsConfig={filterConfig}
+                      setFilter={setFilter}
+                      setPage={setPage}
+                    />
+                  );
+                }
+              })}
+            </>
+          )}
+          <Button
+            disabled={
+              !(filter.length > 0) ||
+              !(filter.filter((obj) => obj.value !== "").length > 0)
+            }
+            onClick={() => handleResetFilter()}
+            variant="ghost"
+            className="order-3 text-sm font-semibold p-1 h-8 disabled:hidden"
+          >
+            Reset Filters
+            <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         </div>
-      )}
 
-      {showDateRange && (
-        <div>
-          <DataTableDatePicker
-            date={dateRange}
-            setDateQueryParams={setDateRange}
-            currDateQueryParams={dateRange}
-            setPage={setPage}
-          />
-        </div>
-      )}
-
-      {showViewControlButton && (
-        <div>
-          <DataTableViewController table={table} />
-        </div>
-      )}
-
-      <div>
-        {filterOptions && (
-          <div>
-            {Object.keys(filterOptions).map((key) => {
-              const filterConfig = filterOptions[key as keyof TData];
-
-              if (filterConfig?.variant === "faceted") {
-                return (
-                  <DataTableFacetedFilter
-                    key={key}
-                    title={key}
-                    options={filterConfig.options}
-                    setFilter={setFilter}
-                    setPage={setPage}
-                    column={table.getColumn(key)}
-                  />
-                );
-              }
-
-              if (filterConfig?.variant === "searchBox") {
-                return (
-                  <DataTableSearchBox
-                    key={key}
-                    filterForId={key}
-                    filterOptionsConfig={filterConfig}
-                    setFilter={setFilter}
-                    setPage={setPage}
-                  />
-                );
-              }
-            })}
-          </div>
-        )}
-        <Button
-          disabled={
-            !(filter.length > 0) ||
-            !(filter.filter((obj) => obj.value !== "").length > 0)
-          }
-          onClick={() => handleResetFilter()}
-          variant="ghost"
-        >
-          Reset Filters
-        </Button>
+        <DataTablePagination
+          table={table}
+          pageSizes={pageSizes}
+          page={page}
+          pageSize={pageSize}
+          setPage={setPage}
+          setPageSize={setPageSize}
+        />
       </div>
 
-      <div className="rounded-md border">
+      <Separator className="bg-primary/20" />
+
+      <div className="my-4 border rounded-md">
         <Table ref={tableRef}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="hover:bg-primary/10 bg-primary/10"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="py-2">
                       <DataTableColumnHeader
                         column={header.column}
                         setSortting={setSorting}
@@ -329,6 +380,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
       <DataTablePagination
         table={table}
         pageSizes={pageSizes}
@@ -348,5 +400,5 @@ export function DataTable<TData, TValue>({
 // Add export button // Completed
 // Add reset filters button // Completed
 // Improve data table option types // Completed
-// Improve UI
+// Improve UI // Completed
 // Add proper loading and empty state
