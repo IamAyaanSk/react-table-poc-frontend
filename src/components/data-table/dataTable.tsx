@@ -359,7 +359,7 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className={`py-2`}
+                      className={`py-2 px-7`}
                       style={{
                         width: header.column.getSize(),
                       }}
@@ -390,7 +390,7 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
-                      className={`text-sm`}
+                      className={`text-sm py-4 px-7`}
                       style={{
                         width: cell.column.getSize(),
                       }}
@@ -429,3 +429,7 @@ export function DataTable<TData, TValue>({
     </div>
   );
 }
+
+// TODO:
+// 1. Optimize actions.
+// 2. Common columns.
