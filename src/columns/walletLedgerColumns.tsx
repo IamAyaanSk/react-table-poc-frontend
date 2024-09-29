@@ -16,8 +16,9 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
     header: "Amount",
     cell: ({ row }) => {
       const amount = row.original.amount;
-      return <p className="text-right mr-10">₹{amount}</p>;
+      return <p className="text-right mr-4">₹{amount}</p>;
     },
+    size: 60,
   },
   {
     accessorKey: "openingBalance",
@@ -101,6 +102,7 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       return <p>{description}</p>;
     },
     enableSorting: false,
+    size: 450,
   },
   {
     accessorKey: "referenceId",
@@ -110,5 +112,6 @@ export const columns: ColumnDef<WalletLedgerTableRecord>[] = [
       return <p>{referenceId}</p>;
     },
     enableSorting: false,
+    size: 380,
   },
 ];

@@ -20,7 +20,14 @@ import {
 
 import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import DataTablePagination from "./dataTablePagination";
 import {
   getCurrentSortingOrderArray,
@@ -88,6 +95,9 @@ export function DataTable<TData, TValue>({
     showViewControlButton = true,
   },
 }: DataTableProps<TData, TValue>) {
+  const memoizedColumns = useMemo(() => columns, [columns]);
+  const memoizedData = useMemo(() => data, [data]);
+
   const tableRef = useRef<HTMLTableElement>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -199,8 +209,8 @@ export function DataTable<TData, TValue>({
   }, [page, pageSize, sorting, filter, dateRange, setQueryParams]);
 
   const table = useReactTable({
-    data: data,
-    columns: columns,
+    data: memoizedData,
+    columns: memoizedColumns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     manualSorting: true,
@@ -333,7 +343,12 @@ export function DataTable<TData, TValue>({
       <Separator className="bg-primary/20" />
 
       <div className="my-4 border rounded-md">
-        <Table ref={tableRef}>
+        <Table
+          ref={tableRef}
+          style={{
+            width: table.getCenterTotalSize(),
+          }}
+        >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
@@ -342,7 +357,13 @@ export function DataTable<TData, TValue>({
               >
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="py-2">
+                    <TableHead
+                      key={header.id}
+                      className={`py-2`}
+                      style={{
+                        width: header.column.getSize(),
+                      }}
+                    >
                       <DataTableColumnHeader
                         column={header.column}
                         setSortting={setSorting}
@@ -368,7 +389,13 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell className="text-sm" key={cell.id}>
+                    <TableCell
+                      className={`text-sm`}
+                      style={{
+                        width: cell.column.getSize(),
+                      }}
+                      key={cell.id}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -402,13 +429,3 @@ export function DataTable<TData, TValue>({
     </div>
   );
 }
-
-// TODO:
-// Add debouncing to input fields  // Completed
-// Add date picker // Completed
-// Handle hidden columns // Completed
-// Add export button // Completed
-// Add reset filters button // Completed
-// Improve data table option types // Completed
-// Improve UI // Completed
-// Add proper loading and empty state

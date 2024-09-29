@@ -1,3 +1,5 @@
+"use client";
+
 import { Table } from "@tanstack/react-table";
 import { Button } from "../ui/button";
 import { Dispatch, SetStateAction } from "react";
