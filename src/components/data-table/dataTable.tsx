@@ -96,7 +96,9 @@ export function DataTable<TData, TValue>({
   },
 }: DataTableProps<TData, TValue>) {
   const memoizedColumns = useMemo(() => columns, [columns]);
-  const memoizedData = useMemo(() => data, [data]);
+
+  // A re-render is most likely to happen when the data changes
+  // So, no need to memoize the data
 
   const tableRef = useRef<HTMLTableElement>(null);
   const pathname = usePathname();
@@ -107,9 +109,17 @@ export function DataTable<TData, TValue>({
   const loadingToastId = useRef<number | string | null>(null);
 
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1"));
+
+  const queryParamPageSize = searchParams.get("page_size");
+  const parsedPageSize = queryParamPageSize
+    ? parseInt(queryParamPageSize)
+    : null;
+
+  const isValidPageSize = parsedPageSize && pageSizes.includes(parsedPageSize);
   const [pageSize, setPageSize] = useState(
-    parseInt(searchParams.get("page_size") || defaultPageSize.toString())
+    isValidPageSize ? parsedPageSize : defaultPageSize
   );
+
   const [sorting, setSorting] = useState<SortingState>(
     getCurrentSortingOrderArray(searchParams.get("sort_by") || "")
   );
@@ -209,7 +219,7 @@ export function DataTable<TData, TValue>({
   }, [page, pageSize, sorting, filter, dateRange, setQueryParams]);
 
   const table = useReactTable({
-    data: memoizedData,
+    data: data,
     columns: memoizedColumns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -219,7 +229,7 @@ export function DataTable<TData, TValue>({
     state: {
       pagination: {
         pageIndex: page - 1,
-        pageSize: pageSize,
+        pageSize,
       },
       sorting,
       columnFilters: filter,
