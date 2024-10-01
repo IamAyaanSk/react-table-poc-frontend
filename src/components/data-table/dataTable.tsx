@@ -429,7 +429,3 @@ export function DataTable<TData, TValue>({
     </div>
   );
 }
-
-// TODO:
-// 1. Optimize actions.
-// 2. Common columns.
