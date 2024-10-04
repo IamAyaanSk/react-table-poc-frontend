@@ -195,3 +195,25 @@ export const getFromDateIstString = (date?: Date) => {
     zone: "Asia/Kolkata",
   }).toFormat("yyyy-MM-dd");
 };
+
+export const getUtcTimestampsForSelectedDates = (selectedDates: DateRange) => {
+  const dateRange = {
+    from: selectedDates.from || new Date(),
+    to: selectedDates.to || new Date(),
+  };
+
+  const startOfDay = DateTime.fromJSDate(dateRange.from, {
+    zone: "Asia/Kolkata",
+  })
+    .startOf("day")
+    .toUTC();
+
+  const endOfDay = DateTime.fromJSDate(dateRange.to, { zone: "Asia/Kolkata" })
+    .endOf("day")
+    .toUTC();
+
+  return {
+    from: startOfDay.toMillis().toString(),
+    to: endOfDay.toMillis().toString(),
+  };
+};

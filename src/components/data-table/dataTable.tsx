@@ -33,6 +33,7 @@ import {
   getCurrentSortingOrderArray,
   getCurrentSortingOrderParamString,
   getFromDateIstString,
+  getUtcTimestampsForSelectedDates,
   htmlTableToExcelFileBuffer,
   isValidDate,
 } from "@/lib/utils";
@@ -237,14 +238,16 @@ export function DataTable<TData, TValue>({
       return acc;
     }, {} as Record<string, string>);
 
+    const utcTimeStamps = getUtcTimestampsForSelectedDates(dateRange);
+
     setQueryParams({
       page: String(page),
       pageSize: String(pageSize),
       search: searchQuery,
       sortBy: getCurrentSortingOrderParamString(sorting),
       ...filterQueryParams,
-      fromDate: getFromDateIstString(dateRange?.from),
-      toDate: getFromDateIstString(dateRange?.to),
+      fromDate: utcTimeStamps.from,
+      toDate: utcTimeStamps.to,
     });
   }, [page, pageSize, sorting, filter, dateRange, searchQuery, setQueryParams]);
 
@@ -328,7 +331,7 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center gap-2">
           {filterOptions && (
             <>
-              {Object.keys(filterOptions).map((key) => {
+              {Object.keys(filterOptions).map((key, index) => {
                 const filterConfig = filterOptions[
                   key as keyof TData
                 ] as FilterOptionsConfig;
@@ -336,7 +339,7 @@ export function DataTable<TData, TValue>({
                   <DataTableFacetedFilter
                     className="order-2"
                     key={key}
-                    title={key}
+                    title={filterConfig.options[index].label}
                     options={filterConfig.options}
                     setFilter={setFilter}
                     setPage={setPage}
