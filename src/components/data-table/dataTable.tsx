@@ -32,7 +32,6 @@ import DataTablePagination from "./dataTablePagination";
 import {
   getCurrentSortingOrderArray,
   getCurrentSortingOrderParamString,
-  getFromDateIstString,
   getUtcTimestampsForSelectedDates,
   htmlTableToExcelFileBuffer,
   isValidDate,
