@@ -188,3 +188,10 @@ export function isValidDate(dateString: string | null) {
   const date = new Date(dateString);
   return !isNaN(date.getTime());
 }
+
+export const getFromDateIstString = (date?: Date) => {
+  if (!date) return "";
+  return DateTime.fromJSDate(date, {
+    zone: "Asia/Kolkata",
+  }).toFormat("yyyy-MM-dd");
+};

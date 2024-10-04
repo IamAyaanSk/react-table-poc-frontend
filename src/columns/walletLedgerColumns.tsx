@@ -20,6 +20,7 @@ export const columns = [
       return <p className="text-right mr-4">₹{amount}</p>;
     },
     size: 60,
+    enableHiding: false,
   }),
 
   walletLedgerColumnHelper.accessor("openingBalance", {
@@ -109,5 +110,26 @@ export const columns = [
     },
     enableSorting: false,
     size: 380,
+  }),
+
+  walletLedgerColumnHelper.display({
+    header: "Actions",
+    id: "actions",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center justify-center">
+          <button
+            className="text-primary hover:text-primary-foreground"
+            onClick={() => {
+              console.log("View", row.original);
+            }}
+          >
+            View
+          </button>
+        </div>
+      );
+    },
+    size: 80,
+    enableSorting: false,
   }),
 ] as ColumnDef<WalletLedgerTableRecord>[];

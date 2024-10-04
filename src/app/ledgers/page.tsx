@@ -39,7 +39,6 @@ export default async function WalletLedgerTable({
                 value: "DEBIT",
               },
             ],
-            variant: "faceted",
           },
           purpose: {
             options: [
@@ -68,13 +67,12 @@ export default async function WalletLedgerTable({
                 value: "SURCHARGE",
               },
             ],
-            variant: "faceted",
           },
+        },
 
-          referenceId: {
-            placeholder: "Search by Reference ID",
-            variant: "searchBox",
-          },
+        hideColumns: {
+          amount: ["ADMIN", "USER"],
+          actions: ["ADMIN"],
         },
       }}
     />

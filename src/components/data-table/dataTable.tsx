@@ -32,9 +32,9 @@ import DataTablePagination from "./dataTablePagination";
 import {
   getCurrentSortingOrderArray,
   getCurrentSortingOrderParamString,
+  getFromDateIstString,
   htmlTableToExcelFileBuffer,
   isValidDate,
-  setStartAndEndOfDay,
 } from "@/lib/utils";
 
 import { DataTableColumnHeader } from "./dataTableColumnHeader";
@@ -61,12 +61,10 @@ type FacetedFilterOptions = {
 
 export interface ColumnFilter {
   id: string;
-  value: string[] | string;
+  value: string[];
 }
 
-export type FilterOptionsConfig =
-  | { variant: "faceted"; options: FacetedFilterOptions }
-  | { variant: "searchBox"; placeholder: string };
+export type FilterOptionsConfig = { options: FacetedFilterOptions };
 
 interface DataTableProps<TData, TValue> {
   config: {
@@ -79,6 +77,8 @@ interface DataTableProps<TData, TValue> {
     showDateRange?: boolean;
     allowExport?: boolean;
     showViewControlButton?: boolean;
+    hideColumns?: Record<string, string[]>;
+    showSearchBox?: boolean;
   };
 }
 
@@ -93,9 +93,13 @@ export function DataTable<TData, TValue>({
     showDateRange = true,
     allowExport = true,
     showViewControlButton = true,
+    hideColumns,
+    showSearchBox = true,
   },
 }: DataTableProps<TData, TValue>) {
   const memoizedColumns = useMemo(() => columns, [columns]);
+
+  const role = "ADMIN";
 
   // A re-render is most likely to happen when the data changes
   // So, no need to memoize the data
@@ -110,7 +114,7 @@ export function DataTable<TData, TValue>({
 
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1"));
 
-  const queryParamPageSize = searchParams.get("page_size");
+  const queryParamPageSize = searchParams.get("pageSize");
   const parsedPageSize = queryParamPageSize
     ? parseInt(queryParamPageSize)
     : null;
@@ -121,24 +125,33 @@ export function DataTable<TData, TValue>({
   );
 
   const [sorting, setSorting] = useState<SortingState>(
-    getCurrentSortingOrderArray(searchParams.get("sort_by") || "")
+    getCurrentSortingOrderArray(searchParams.get("sortBy") || "")
   );
 
-  const queryParamsFromDate = searchParams.get("from_date");
-  const queryParamsToDate = searchParams.get("to_date");
+  let currDate: DateRange = {
+    from: undefined,
+    to: undefined,
+  };
 
-  const currDate: DateRange = setStartAndEndOfDay({
-    from:
-      queryParamsFromDate && isValidDate(queryParamsFromDate)
-        ? new Date(queryParamsFromDate)
-        : new Date(),
-    to:
-      queryParamsToDate && isValidDate(queryParamsToDate)
-        ? new Date(queryParamsToDate)
-        : new Date(),
-  });
+  if (showDateRange) {
+    const queryParamsFromDate = searchParams.get("fromDate");
+    const queryParamsToDate = searchParams.get("toDate");
 
+    currDate = {
+      from:
+        queryParamsFromDate && isValidDate(queryParamsFromDate)
+          ? new Date(queryParamsFromDate)
+          : new Date(),
+      to:
+        queryParamsToDate && isValidDate(queryParamsToDate)
+          ? new Date(queryParamsToDate)
+          : new Date(),
+    };
+  }
   const [dateRange, setDateRange] = useState<DateRange>(currDate);
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
 
   let filterState: ColumnFilter[] = [];
 
@@ -157,7 +170,19 @@ export function DataTable<TData, TValue>({
 
   const [filter, setFilter] = useState<ColumnFilter[]>(filterState);
 
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  let columnVisibilityState: VisibilityState = {};
+
+  if (hideColumns) {
+    columnVisibilityState = Object.keys(hideColumns).reduce((acc, key) => {
+      const hideForRoles = hideColumns[key];
+      if (hideForRoles && hideForRoles.includes(role)) acc[key] = false;
+      return acc;
+    }, {} as VisibilityState);
+  }
+
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    columnVisibilityState
+  );
 
   const setQueryParams = useCallback(
     (params: Record<string, string>) => {
@@ -200,23 +225,20 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     console.log(dateRange);
     const filterQueryParams = filter.reduce((acc, curr) => {
-      if (typeof curr.value === "string") {
-        acc[curr.id] = curr.value;
-      } else {
-        acc[curr.id] = curr.value.join(",");
-      }
+      acc[curr.id] = curr.value.join(",");
       return acc;
     }, {} as Record<string, string>);
 
     setQueryParams({
       page: String(page),
-      page_size: String(pageSize),
-      sort_by: getCurrentSortingOrderParamString(sorting),
+      pageSize: String(pageSize),
+      search: searchQuery,
+      sortBy: getCurrentSortingOrderParamString(sorting),
       ...filterQueryParams,
-      from_date: dateRange?.from?.toISOString() as string,
-      to_date: dateRange?.to?.toISOString() as string,
+      fromDate: getFromDateIstString(dateRange?.from),
+      toDate: getFromDateIstString(dateRange?.to),
     });
-  }, [page, pageSize, sorting, filter, dateRange, setQueryParams]);
+  }, [page, pageSize, sorting, filter, dateRange, setQueryParams, searchQuery]);
 
   const table = useReactTable({
     data: data,
@@ -258,12 +280,17 @@ export function DataTable<TData, TValue>({
 
   const handleResetFilter = () => {
     setFilter([]);
+    setSearchQuery("");
   };
 
   return (
     <div className="m-4 border border-primary px-6 rounded-md pb-6">
       <div className="flex flex-col gap-2 justify-center pt-6 pb-4">
-        <div className="flex justify-between items-center">
+        <div
+          className={`flex items-center ${
+            showDateRange ? "justify-between" : "justify-end"
+          }`}
+        >
           {showDateRange && (
             <div>
               <DataTableDatePicker
@@ -273,7 +300,7 @@ export function DataTable<TData, TValue>({
               />
             </div>
           )}
-          <div className="flex gap-4 items-center">
+          <div className={`flex gap-4 items-center`}>
             {allowExport && (
               <div className="flex items-center gap-2 flex-wrap">
                 <Button onClick={handleExport} size="sm" className="h-8 flex">
@@ -295,41 +322,35 @@ export function DataTable<TData, TValue>({
           {filterOptions && (
             <>
               {Object.keys(filterOptions).map((key) => {
-                const filterConfig = filterOptions[key as keyof TData];
-
-                if (filterConfig?.variant === "faceted") {
-                  return (
-                    <DataTableFacetedFilter
-                      className="order-2"
-                      key={key}
-                      title={key}
-                      options={filterConfig.options}
-                      setFilter={setFilter}
-                      setPage={setPage}
-                      column={table.getColumn(key)}
-                    />
-                  );
-                }
-
-                if (filterConfig?.variant === "searchBox") {
-                  return (
-                    <DataTableSearchBox
-                      className="order-1"
-                      key={key}
-                      filterForId={key}
-                      filterOptionsConfig={filterConfig}
-                      setFilter={setFilter}
-                      setPage={setPage}
-                    />
-                  );
-                }
+                const filterConfig = filterOptions[
+                  key as keyof TData
+                ] as FilterOptionsConfig;
+                return (
+                  <DataTableFacetedFilter
+                    className="order-2"
+                    key={key}
+                    title={key}
+                    options={filterConfig.options}
+                    setFilter={setFilter}
+                    setPage={setPage}
+                    column={table.getColumn(key)}
+                  />
+                );
               })}
             </>
+          )}
+
+          {showSearchBox && (
+            <DataTableSearchBox
+              className="order-1"
+              setSearchQuery={setSearchQuery}
+              setPage={setPage}
+            />
           )}
           <Button
             disabled={
               !(filter.length > 0) ||
-              !(filter.filter((obj) => obj.value !== "").length > 0)
+              !(filter.filter((obj) => obj.value.length > 0).length > 0)
             }
             onClick={() => handleResetFilter()}
             variant="ghost"
