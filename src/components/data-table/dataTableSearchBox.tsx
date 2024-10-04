@@ -6,17 +6,21 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Button } from "../ui/button";
 
 interface DataTableSearchBoxProps {
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   className?: string;
+  placeHolder: string;
 }
 
 export default function DataTableSearchBox({
   setSearchQuery,
   setPage,
   className,
+  placeHolder,
 }: DataTableSearchBoxProps) {
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,7 +45,7 @@ export default function DataTableSearchBox({
         className={cn("h-8 w-[200px] lg:w-[250px] text-sm pl-10", className)}
         ref={inputRef}
         value={inputValue}
-        placeholder={`Search here..`}
+        placeholder={placeHolder}
         onChange={(event) => {
           setInputValue(event.target.value);
           handleInputChange(event.target.value);
@@ -52,6 +56,17 @@ export default function DataTableSearchBox({
           }
         }}
       />
+      <Button
+        variant={"ghost"}
+        onClick={() => {
+          setInputValue("");
+          setSearchQuery("");
+        }}
+        disabled={inputValue.length === 0}
+        className="absolute  right-2 top-1/4 h-3 hover:bg-white disabled:hidden"
+      >
+        <Cross2Icon className="absolute h-3 w-3 text-gray-500" />
+      </Button>
     </div>
   );
 }

@@ -78,7 +78,11 @@ interface DataTableProps<TData, TValue> {
     allowExport?: boolean;
     showViewControlButton?: boolean;
     hideColumns?: Record<string, string[]>;
-    showSearchBox?: boolean;
+    searchBox?:
+      | {
+          placeHolder: string;
+        }
+      | false;
   };
 }
 
@@ -94,7 +98,9 @@ export function DataTable<TData, TValue>({
     allowExport = true,
     showViewControlButton = true,
     hideColumns,
-    showSearchBox = true,
+    searchBox = {
+      placeHolder: "Search here..",
+    },
   },
 }: DataTableProps<TData, TValue>) {
   const memoizedColumns = useMemo(() => columns, [columns]);
@@ -148,9 +154,11 @@ export function DataTable<TData, TValue>({
           : new Date(),
     };
   }
+
   const [dateRange, setDateRange] = useState<DateRange>(currDate);
+
   const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || ""
+    (searchBox && searchParams.get("search")) || ""
   );
 
   let filterState: ColumnFilter[] = [];
@@ -238,7 +246,7 @@ export function DataTable<TData, TValue>({
       fromDate: getFromDateIstString(dateRange?.from),
       toDate: getFromDateIstString(dateRange?.to),
     });
-  }, [page, pageSize, sorting, filter, dateRange, setQueryParams, searchQuery]);
+  }, [page, pageSize, sorting, filter, dateRange, searchQuery, setQueryParams]);
 
   const table = useReactTable({
     data: data,
@@ -280,7 +288,6 @@ export function DataTable<TData, TValue>({
 
   const handleResetFilter = () => {
     setFilter([]);
-    setSearchQuery("");
   };
 
   return (
@@ -340,17 +347,18 @@ export function DataTable<TData, TValue>({
             </>
           )}
 
-          {showSearchBox && (
+          {searchBox && (
             <DataTableSearchBox
               className="order-1"
               setSearchQuery={setSearchQuery}
               setPage={setPage}
+              placeHolder={searchBox.placeHolder}
             />
           )}
           <Button
             disabled={
-              !(filter.length > 0) ||
-              !(filter.filter((obj) => obj.value.length > 0).length > 0)
+              filter.length === 0 ||
+              filter.every((obj) => obj.value.length === 0)
             }
             onClick={() => handleResetFilter()}
             variant="ghost"
