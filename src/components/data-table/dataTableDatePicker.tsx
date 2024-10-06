@@ -2,10 +2,9 @@
 
 import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
-import { cn, setStartAndEndOfDay } from "@/lib/utils";
+import { cn, getFromDateIstString } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -40,7 +39,7 @@ export function DataTableDatePicker({
 
   const handlePopoverChange = (open: boolean) => {
     if (!open && date?.from && date?.to) {
-      setDateQueryParams(setStartAndEndOfDay(date));
+      setDateQueryParams(date);
       setPage(1);
     } else {
       setDate(currDateQueryParams);
@@ -63,11 +62,11 @@ export function DataTableDatePicker({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
+                  {getFromDateIstString(date.from)} -{" "}
+                  {getFromDateIstString(date.to)}
                 </>
               ) : (
-                format(date.from, "LLL dd, y")
+                getFromDateIstString(date.from)
               )
             ) : (
               <span>Pick a date</span>
@@ -91,7 +90,7 @@ export function DataTableDatePicker({
             }
             onClick={() => {
               setPage(1);
-              setDateQueryParams(setStartAndEndOfDay(date));
+              setDateQueryParams(date);
               setIsOpen(false);
             }}
           >

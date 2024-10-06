@@ -26,7 +26,8 @@ import { ColumnFilter } from "./dataTable";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
-  title?: string;
+  title: string;
+  filterName?: string;
   options: {
     label: string;
     value: string;
@@ -44,6 +45,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   className,
   setFilter,
   setPage,
+  filterName,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const selectedValues = new Set(column?.getFilterValue() as string[]);
 
@@ -56,7 +58,7 @@ export function DataTableFacetedFilter<TData, TValue>({
           className={cn("h-8 border-dashed", className)}
         >
           <PlusCircledIcon className="mr-2 h-4 w-4" />
-          <span className=" capitalize">{title}</span>
+          <span>{title}</span>
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
@@ -94,7 +96,7 @@ export function DataTableFacetedFilter<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
-          <CommandInput className=" capitalize" placeholder={title} />
+          <CommandInput placeholder={title} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
@@ -117,6 +119,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                         if (selectedValues.size > 0) {
                           newFilter.push({
                             id: column?.id as string,
+                            name: filterName,
                             value: Array.from(selectedValues),
                           });
                         }

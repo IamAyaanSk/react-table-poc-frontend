@@ -29,6 +29,7 @@ export default async function WalletLedgerTable({
         pageSizes: [100, 200, 500, 1000],
         filterOptions: {
           type: {
+            filterTitle: "Ledger Type",
             options: [
               {
                 label: "Credit",
@@ -41,6 +42,7 @@ export default async function WalletLedgerTable({
             ],
           },
           purpose: {
+            filterTitle: "Ledger Purpose",
             options: [
               {
                 label: "Wallet",

@@ -2,6 +2,7 @@
 
 import {
   ColumnDef,
+  DeepKeys,
   flexRender,
   getCoreRowModel,
   SortingState,
@@ -34,7 +35,6 @@ import {
   getCurrentSortingOrderParamString,
   getUtcTimestampsForSelectedDates,
   htmlTableToExcelFileBuffer,
-  isValidDate,
 } from "@/lib/utils";
 
 import { DataTableColumnHeader } from "./dataTableColumnHeader";
@@ -51,9 +51,8 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
 
 type OptionalFilterOptions<T> = {
-  [K in keyof T]?: FilterOptionsConfig;
+  [K in DeepKeys<T>]?: FilterOptionsConfig;
 };
-
 type FacetedFilterOptions = {
   label: string;
   value: string;
@@ -61,10 +60,15 @@ type FacetedFilterOptions = {
 
 export interface ColumnFilter {
   id: string;
+  name?: string;
   value: string[];
 }
 
-export type FilterOptionsConfig = { options: FacetedFilterOptions };
+export type FilterOptionsConfig = {
+  filterName?: string;
+  options: FacetedFilterOptions;
+  filterTitle: string;
+};
 
 interface DataTableProps<TData, TValue> {
   config: {
@@ -120,14 +124,9 @@ export function DataTable<TData, TValue>({
 
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1"));
 
-  const queryParamPageSize = searchParams.get("pageSize");
-  const parsedPageSize = queryParamPageSize
-    ? parseInt(queryParamPageSize)
-    : null;
-
-  const isValidPageSize = parsedPageSize && pageSizes.includes(parsedPageSize);
+  const pageSizeQueryParam = searchParams.get("pageSize");
   const [pageSize, setPageSize] = useState(
-    isValidPageSize ? parsedPageSize : defaultPageSize
+    pageSizeQueryParam ? parseInt(pageSizeQueryParam) : defaultPageSize
   );
 
   const [sorting, setSorting] = useState<SortingState>(
@@ -144,14 +143,12 @@ export function DataTable<TData, TValue>({
     const queryParamsToDate = searchParams.get("toDate");
 
     currDate = {
-      from:
-        queryParamsFromDate && isValidDate(queryParamsFromDate)
-          ? new Date(queryParamsFromDate)
-          : new Date(),
-      to:
-        queryParamsToDate && isValidDate(queryParamsToDate)
-          ? new Date(queryParamsToDate)
-          : new Date(),
+      from: queryParamsFromDate
+        ? new Date(parseInt(queryParamsFromDate))
+        : new Date(),
+      to: queryParamsToDate
+        ? new Date(parseInt(queryParamsToDate))
+        : new Date(),
     };
   }
 
@@ -165,10 +162,14 @@ export function DataTable<TData, TValue>({
 
   if (filterOptions) {
     filterState = Object.keys(filterOptions).reduce((acc, key) => {
-      const queryParam = searchParams.get(key);
+      const filterName = filterOptions[key as keyof TData]?.filterName;
+      console.log(filterName);
+      const queryParam = searchParams.get(filterName || key);
+      console.log(queryParam);
       if (queryParam) {
         acc.push({
           id: key,
+          name: filterName,
           value: queryParam.split(","),
         });
       }
@@ -233,11 +234,13 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     console.log(dateRange);
     const filterQueryParams = filter.reduce((acc, curr) => {
-      acc[curr.id] = curr.value.join(",");
+      const filterName = curr.name || curr.id;
+      acc[filterName] = curr.value.join(",");
       return acc;
     }, {} as Record<string, string>);
 
     const utcTimeStamps = getUtcTimestampsForSelectedDates(dateRange);
+    console.log(filter);
 
     setQueryParams({
       page: String(page),
@@ -338,7 +341,8 @@ export function DataTable<TData, TValue>({
                   <DataTableFacetedFilter
                     className="order-2"
                     key={key}
-                    title={filterConfig.options[index].label}
+                    filterName={filterConfig.filterName}
+                    title={filterConfig.filterTitle}
                     options={filterConfig.options}
                     setFilter={setFilter}
                     setPage={setPage}
