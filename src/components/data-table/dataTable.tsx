@@ -197,11 +197,16 @@ export function DataTable<TData, TValue>({
     (params: Record<string, string>) => {
       const newParams = new URLSearchParams();
 
-      for (const [key, value] of Object.entries(params)) {
-        if (value) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (!value) return;
+
+        if (Array.isArray(value)) {
+          value.forEach((val) => newParams.append(key, val));
+        } else {
           newParams.set(key, value);
         }
-      }
+      });
+
       startTransition(() => {
         router.push(`${pathname}?${newParams.toString()}`);
       });
@@ -235,12 +240,11 @@ export function DataTable<TData, TValue>({
     console.log(dateRange);
     const filterQueryParams = filter.reduce((acc, curr) => {
       const filterName = curr.name || curr.id;
-      acc[filterName] = curr.value.join(",");
+      acc[filterName] = curr.value;
       return acc;
-    }, {} as Record<string, string>);
+    }, {} as Record<string, string[]>);
 
     const utcTimeStamps = getUtcTimestampsForSelectedDates(dateRange);
-    console.log(filter);
 
     setQueryParams({
       page: String(page),
@@ -248,8 +252,8 @@ export function DataTable<TData, TValue>({
       search: searchQuery,
       sortBy: getCurrentSortingOrderParamString(sorting),
       ...filterQueryParams,
-      fromDate: utcTimeStamps.from,
-      toDate: utcTimeStamps.to,
+      startDate: utcTimeStamps.from,
+      endDate: utcTimeStamps.to,
     });
   }, [page, pageSize, sorting, filter, dateRange, searchQuery, setQueryParams]);
 

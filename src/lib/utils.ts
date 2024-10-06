@@ -16,9 +16,9 @@ export function getCurrentSortingOrderArray(sortingParams: string) {
   if (!sortingParams) return [];
   const initialArray: SortingState = [];
   const orderByArray = sortingParams.split(",").reduce((acc, curr) => {
-    const [key, value] = [curr.slice(1), curr[0]];
+    const [key, value] = curr.split(":");
 
-    const desc = value === "-" ? true : false;
+    const desc = value === "desc" ? true : false;
 
     acc.push({
       id: key,
@@ -34,7 +34,7 @@ export function getCurrentSortingOrderArray(sortingParams: string) {
 export function getCurrentSortingOrderParamString(sortingArray: SortingState) {
   return sortingArray
     .map((sort) => {
-      return `${sort.desc ? "-" : "+"}${sort.id}`;
+      return `${sort.id}:${sort.desc === true ? "desc" : "asc"}`;
     })
     .join(",");
 }
