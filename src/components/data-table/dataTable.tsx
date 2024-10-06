@@ -333,7 +333,7 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center gap-2">
           {filterOptions && (
             <>
-              {Object.keys(filterOptions).map((key, index) => {
+              {Object.keys(filterOptions).map((key) => {
                 const filterConfig = filterOptions[
                   key as keyof TData
                 ] as FilterOptionsConfig;
