@@ -205,7 +205,7 @@ export function DataTable<TData, TValue>({
       const newSearchParams = qs.stringify(params, { arrayFormat: "brackets" });
 
       startTransition(() => {
-        router.push(`${pathname}?${newSearchParams}`);
+        router.replace(`${pathname}?${newSearchParams}`);
       });
     },
     [router, pathname]
