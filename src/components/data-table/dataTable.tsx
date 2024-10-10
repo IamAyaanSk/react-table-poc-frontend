@@ -32,7 +32,7 @@ import {
 import DataTablePagination from "./dataTablePagination";
 import {
   getCurrentSortingOrderArray,
-  getCurrentSortingOrderParamString,
+  getCurrentSortingOrderParamArray,
   getUtcTimestampsForSelectedDates,
   htmlTableToExcelFileBuffer,
 } from "@/lib/utils";
@@ -49,6 +49,8 @@ import { toast } from "sonner";
 import { FileSpreadsheet } from "lucide-react";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
+import useDebounce from "@/hooks/useDebounce";
+import qs from "qs";
 
 type OptionalFilterOptions<T> = {
   [K in DeepKeys<T>]?: FilterOptionsConfig;
@@ -130,7 +132,7 @@ export function DataTable<TData, TValue>({
   );
 
   const [sorting, setSorting] = useState<SortingState>(
-    getCurrentSortingOrderArray(searchParams.get("sortBy") || "")
+    getCurrentSortingOrderArray(searchParams.getAll("sort[]"))
   );
 
   let currDate: DateRange = {
@@ -139,15 +141,15 @@ export function DataTable<TData, TValue>({
   };
 
   if (showDateRange) {
-    const queryParamsFromDate = searchParams.get("fromDate");
-    const queryParamsToDate = searchParams.get("toDate");
+    const queryParamsStartDate = searchParams.get("startDate");
+    const queryParamsEndDate = searchParams.get("endDate");
 
     currDate = {
-      from: queryParamsFromDate
-        ? new Date(parseInt(queryParamsFromDate))
+      from: queryParamsStartDate
+        ? new Date(parseInt(queryParamsStartDate))
         : new Date(),
-      to: queryParamsToDate
-        ? new Date(parseInt(queryParamsToDate))
+      to: queryParamsEndDate
+        ? new Date(parseInt(queryParamsEndDate))
         : new Date(),
     };
   }
@@ -163,14 +165,16 @@ export function DataTable<TData, TValue>({
   if (filterOptions) {
     filterState = Object.keys(filterOptions).reduce((acc, key) => {
       const filterName = filterOptions[key as keyof TData]?.filterName;
-      console.log(filterName);
-      const queryParam = searchParams.get(filterName || key);
-      console.log(queryParam);
+
+      const queryParam = searchParams.getAll(
+        filterName ? `${filterName}[]` : `${key}[]`
+      );
+
       if (queryParam) {
         acc.push({
           id: key,
           name: filterName,
-          value: queryParam.split(","),
+          value: queryParam,
         });
       }
       return acc;
@@ -194,25 +198,20 @@ export function DataTable<TData, TValue>({
   );
 
   const setQueryParams = useCallback(
-    (params: Record<string, string>) => {
-      const newParams = new URLSearchParams();
-
-      Object.entries(params).forEach(([key, value]) => {
-        if (!value) return;
-
-        if (Array.isArray(value)) {
-          value.forEach((val) => newParams.append(key, val));
-        } else {
-          newParams.set(key, value);
-        }
-      });
+    (params: Record<string, string | string[]>) => {
+      for (const key in params) {
+        if (!params[key]) delete params[key];
+      }
+      const newSearchParams = qs.stringify(params, { arrayFormat: "brackets" });
 
       startTransition(() => {
-        router.push(`${pathname}?${newParams.toString()}`);
+        router.push(`${pathname}?${newSearchParams}`);
       });
     },
     [router, pathname]
   );
+
+  const debouncedSetQueryParams = useDebounce(setQueryParams, 500);
 
   useEffect(() => {
     if (isPending) {
@@ -237,7 +236,6 @@ export function DataTable<TData, TValue>({
   }, [isPending]);
 
   useEffect(() => {
-    console.log(dateRange);
     const filterQueryParams = filter.reduce((acc, curr) => {
       const filterName = curr.name || curr.id;
       acc[filterName] = curr.value;
@@ -246,16 +244,24 @@ export function DataTable<TData, TValue>({
 
     const utcTimeStamps = getUtcTimestampsForSelectedDates(dateRange);
 
-    setQueryParams({
+    debouncedSetQueryParams({
       page: String(page),
       pageSize: String(pageSize),
       search: searchQuery,
-      sortBy: getCurrentSortingOrderParamString(sorting),
+      sort: getCurrentSortingOrderParamArray(sorting),
       ...filterQueryParams,
       startDate: utcTimeStamps.from,
       endDate: utcTimeStamps.to,
     });
-  }, [page, pageSize, sorting, filter, dateRange, searchQuery, setQueryParams]);
+  }, [
+    page,
+    pageSize,
+    sorting,
+    filter,
+    dateRange,
+    searchQuery,
+    debouncedSetQueryParams,
+  ]);
 
   const table = useReactTable({
     data: data,

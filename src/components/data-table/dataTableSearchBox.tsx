@@ -1,6 +1,5 @@
 "use client";
 
-import useDebounce from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -37,7 +36,6 @@ export default function DataTableSearchBox({
     setSearchQuery(searchQuery);
   };
 
-  const handleInputChange = useDebounce(sendSearchQuery, 700);
   return (
     <div className="relative">
       <Search className="w-4 h-4 absolute top-2 left-4" />
@@ -48,7 +46,7 @@ export default function DataTableSearchBox({
         placeholder={placeHolder}
         onChange={(event) => {
           setInputValue(event.target.value);
-          handleInputChange(event.target.value);
+          sendSearchQuery(event.target.value);
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter") {

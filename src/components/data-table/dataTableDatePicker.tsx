@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DateTime } from "luxon";
 
 export function DataTableDatePicker({
   className,
@@ -26,16 +27,39 @@ export function DataTableDatePicker({
   const [date, setDate] = React.useState<DateRange>(currDateQueryParams);
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
-  const checkDateRangesForEquality = (
-    firstDateRange: DateRange,
-    secondDateRange: DateRange
-  ) => {
-    if (!firstDateRange || !secondDateRange) return false;
-    return (
-      firstDateRange.from?.getTime() === secondDateRange.from?.getTime() &&
-      firstDateRange.to?.getTime() === secondDateRange.to?.getTime()
-    );
-  };
+  const checkDateRangesForEquality = React.useCallback(
+    (firstDateRange: DateRange, secondDateRange: DateRange) => {
+      if (!firstDateRange || !secondDateRange) {
+        return false;
+      }
+
+      const { from: firstFrom, to: firstTo } = firstDateRange;
+      const { from: secondFrom, to: secondTo } = secondDateRange;
+
+      const isFirstRangeValid = firstFrom && firstTo;
+      const isSecondRangeValid = secondFrom && secondTo;
+
+      if (!isFirstRangeValid || !isSecondRangeValid) {
+        return false;
+      }
+
+      const areFromDatesEqual = DateTime.fromJSDate(firstFrom).hasSame(
+        DateTime.fromJSDate(secondFrom),
+        "day"
+      );
+
+      const areToDatesEqual = DateTime.fromJSDate(firstTo).hasSame(
+        DateTime.fromJSDate(secondTo),
+        "day"
+      );
+
+      return areFromDatesEqual && areToDatesEqual;
+    },
+    []
+  );
+
+  const today = DateTime.fromJSDate(new Date(), { zone: "Asia/Kolkata" });
+  const threeMonthsAgo = today.minus({ months: 3 });
 
   const handlePopoverChange = (open: boolean) => {
     if (!open && date?.from && date?.to) {
@@ -80,7 +104,13 @@ export function DataTableDatePicker({
             defaultMonth={date?.from}
             selected={date}
             onSelect={(e) => setDate(e as DateRange)}
-            max={20}
+            toDate={today.toJSDate()}
+            fromDate={threeMonthsAgo.toJSDate()}
+            max={30}
+            disabled={{
+              before: threeMonthsAgo.toJSDate(),
+              after: today.toJSDate(),
+            }}
           />
           <Button
             className="text-xs mx-2 h-8 mb-4"

@@ -12,11 +12,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getCurrentSortingOrderArray(sortingParams: string) {
-  if (!sortingParams) return [];
+export function getCurrentSortingOrderArray(sortingParams: string[]) {
   const initialArray: SortingState = [];
-  const orderByArray = sortingParams.split(",").reduce((acc, curr) => {
-    const [key, value] = curr.split(":");
+  const orderByArray = sortingParams.reduce((acc, curr) => {
+    const [key, value] = curr.split("_");
 
     const desc = value === "desc" ? true : false;
 
@@ -31,12 +30,10 @@ export function getCurrentSortingOrderArray(sortingParams: string) {
   return orderByArray;
 }
 
-export function getCurrentSortingOrderParamString(sortingArray: SortingState) {
-  return sortingArray
-    .map((sort) => {
-      return `${sort.id}:${sort.desc === true ? "desc" : "asc"}`;
-    })
-    .join(",");
+export function getCurrentSortingOrderParamArray(sortingArray: SortingState) {
+  return sortingArray.map((sort) => {
+    return `${sort.id}-${sort.desc === true ? "desc" : "asc"}`;
+  });
 }
 
 export const getIstString = (date: Date) => {
@@ -183,15 +180,7 @@ export async function htmlTableToExcelFileBuffer(
   }
 }
 
-export function isValidDate(timeStampString: string | null) {
-  if (!timeStampString) return false;
-  console.log(timeStampString);
-  const date = new Date(parseInt(timeStampString));
-  return !isNaN(date.getTime());
-}
-
-export const getFromDateIstString = (date?: Date) => {
-  if (!date) return "";
+export const getFromDateIstString = (date: Date) => {
   return DateTime.fromJSDate(date, {
     zone: "Asia/Kolkata",
   }).toFormat("yyyy-MM-dd");
