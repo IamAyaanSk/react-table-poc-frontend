@@ -12,7 +12,7 @@ export default async function WalletLedgerTable({
 }: {
   searchParams?: Record<string, string>;
 }) {
-  let data = [];
+  let data;
   let totalRecords = 0;
   let isError = false;
   let message = "Failed to fetch data.";
@@ -45,7 +45,7 @@ export default async function WalletLedgerTable({
           </Button>
         </div>
       ) : (
-        data.length > 0 && (
+        data && (
           <DataTable
             config={{
               columns,
