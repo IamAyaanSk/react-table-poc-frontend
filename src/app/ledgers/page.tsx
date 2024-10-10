@@ -12,24 +12,26 @@ export default async function WalletLedgerTable({
 }: {
   searchParams?: Record<string, string>;
 }) {
-  let data;
+  let data = [];
   let totalRecords = 0;
   let isError = false;
   let message = "Failed to fetch data.";
 
-  const response = await fetch(
-    `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
-      arrayFormat: "brackets",
-    })}`
-  );
-  const result = await response.json();
+  if (searchParams && Object.keys(searchParams).length > 0) {
+    const response = await fetch(
+      `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
+        arrayFormat: "brackets",
+      })}`
+    );
+    const result = await response.json();
 
-  if (!response.ok) {
-    isError = true;
-    message = `Error: ${response.status} - ${result.error}`;
-  } else {
-    data = result.data;
-    totalRecords = result.totalRecords;
+    if (!response.ok) {
+      isError = true;
+      message = `Error: ${response.status} - ${result.error}`;
+    } else {
+      data = result.data;
+      totalRecords = result.totalRecords;
+    }
   }
 
   return (
@@ -45,40 +47,38 @@ export default async function WalletLedgerTable({
           </Button>
         </div>
       ) : (
-        data && (
-          <DataTable
-            config={{
-              columns,
-              data,
-              totalRecords,
-              pageSizes: [100, 200, 500, 1000],
-              filterOptions: {
-                type: {
-                  filterTitle: "Ledger Type",
-                  options: [
-                    { label: "Credit", value: "CREDIT" },
-                    { label: "Debit", value: "DEBIT" },
-                  ],
-                },
-                purpose: {
-                  filterTitle: "Ledger Purpose",
-                  options: [
-                    { label: "Wallet", value: "WALLET" },
-                    { label: "Fund Request", value: "FUND_REQUEST" },
-                    { label: "Service", value: "SERVICE" },
-                    { label: "Commission", value: "COMMISION" },
-                    { label: "Refund", value: "REFUND" },
-                    { label: "Surcharge", value: "SURCHARGE" },
-                  ],
-                },
+        <DataTable
+          config={{
+            columns,
+            data,
+            totalRecords,
+            pageSizes: [100, 200, 500, 1000],
+            filterOptions: {
+              type: {
+                filterTitle: "Ledger Type",
+                options: [
+                  { label: "Credit", value: "CREDIT" },
+                  { label: "Debit", value: "DEBIT" },
+                ],
               },
-              hideColumns: {
-                amount: ["ADMIN", "USER"],
-                actions: ["ADMIN"],
+              purpose: {
+                filterTitle: "Ledger Purpose",
+                options: [
+                  { label: "Wallet", value: "WALLET" },
+                  { label: "Fund Request", value: "FUND_REQUEST" },
+                  { label: "Service", value: "SERVICE" },
+                  { label: "Commission", value: "COMMISION" },
+                  { label: "Refund", value: "REFUND" },
+                  { label: "Surcharge", value: "SURCHARGE" },
+                ],
               },
-            }}
-          />
-        )
+            },
+            hideColumns: {
+              amount: ["ADMIN", "USER"],
+              actions: ["ADMIN"],
+            },
+          }}
+        />
       )}
     </div>
   );
