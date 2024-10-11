@@ -31,7 +31,7 @@ import {
 } from "react";
 import DataTablePagination from "./dataTablePagination";
 import {
-  getCurrentSortingOrderArray,
+  getCurrentSortingOrderState,
   getCurrentSortingOrderParamArray,
   getUtcTimestampsForSelectedDates,
   htmlTableToExcelFileBuffer,
@@ -132,7 +132,7 @@ export function DataTable<TData, TValue>({
   );
 
   const [sorting, setSorting] = useState<SortingState>(
-    getCurrentSortingOrderArray(searchParams.getAll("sort[]"))
+    getCurrentSortingOrderState(searchParams.getAll("sort[]"))
   );
 
   let currDate: DateRange = {

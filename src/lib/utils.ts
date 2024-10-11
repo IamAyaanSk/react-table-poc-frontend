@@ -12,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getCurrentSortingOrderArray(sortingParams: string[]) {
+export function getCurrentSortingOrderState(sortingParams: string[]) {
   const initialArray: SortingState = [];
   const orderByArray = sortingParams.reduce((acc, curr) => {
     const [key, value] = curr.split("-");
@@ -35,15 +35,6 @@ export function getCurrentSortingOrderParamArray(sortingArray: SortingState) {
     return `${sort.id}-${sort.desc === true ? "desc" : "asc"}`;
   });
 }
-
-export const setStartAndEndOfDay = (date?: DateRange): DateRange => {
-  if (!date || !date.from || !date.to)
-    return { from: startOfDay(new Date()), to: endOfDay(new Date()) };
-  return {
-    from: startOfDay(date.from),
-    to: endOfDay(date.to),
-  };
-};
 
 export async function htmlTableToExcelFileBuffer(
   table: HTMLTableElement
