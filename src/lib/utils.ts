@@ -166,7 +166,7 @@ export async function htmlTableToExcelFileBuffer(
 export const getFromDateIstString = (date: Date) => {
   return DateTime.fromJSDate(date, {
     zone: "Asia/Kolkata",
-  }).toFormat("yyyy-MM-dd");
+  }).toLocaleString(DateTime.DATE_MED);
 };
 
 export const getUtcTimestampsForSelectedDates = (selectedDates: DateRange) => {

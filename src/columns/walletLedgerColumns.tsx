@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { fromDateIstDateTime } from "@/lib/utils";
 import { Ledger } from "@prisma/client";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import Link from "next/link";
 
 export type WalletLedgerTableRecord = Omit<
   Ledger,
@@ -117,16 +118,14 @@ export const columns = [
     id: "actions",
     cell: ({ row }) => {
       return (
-        <div className="flex items-center justify-center">
-          <button
-            className="text-primary hover:text-primary-foreground"
-            onClick={() => {
-              console.log("View", row.original);
-            }}
-          >
-            View
-          </button>
-        </div>
+        <button
+          className="text-primary flex items-center justify-center"
+          onClick={() => {
+            console.log("View", row.original);
+          }}
+        >
+          <Link href={"/ledgers"}>View</Link>
+        </button>
       );
     },
     size: 80,

@@ -82,7 +82,7 @@ export function DataTableDatePicker({
               !date && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="text-white mr-2 h-4 w-4" />
             {date?.from ? (
               date.to ? (
                 <>
@@ -93,7 +93,7 @@ export function DataTableDatePicker({
                 getFromDateIstString(date.from)
               )
             ) : (
-              <span>Pick a date</span>
+              <span className="text-white">Pick a date</span>
             )}
           </Button>
         </PopoverTrigger>
