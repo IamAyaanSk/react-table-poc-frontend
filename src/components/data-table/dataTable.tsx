@@ -250,8 +250,8 @@ export function DataTable<TData, TValue>({
       search: searchQuery,
       sort: getCurrentSortingOrderParamArray(sorting),
       ...filterQueryParams,
-      startDate: utcTimeStamps.from,
-      endDate: utcTimeStamps.to,
+      startDate: showDateRange ? utcTimeStamps.from : "",
+      endDate: showDateRange ? utcTimeStamps.to : "",
     });
   }, [
     page,

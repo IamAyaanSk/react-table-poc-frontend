@@ -17,6 +17,7 @@ export default async function WalletLedgerTable({
   let isError = false;
   let message = "Failed to fetch data.";
 
+  // Fetch data only if query params avl ( as page and page size are required, it also stops the initial fetch without search params)
   if (searchParams && Object.keys(searchParams).length > 0) {
     const response = await fetch(
       `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
@@ -74,8 +75,7 @@ export default async function WalletLedgerTable({
               },
             },
             hideColumns: {
-              amount: ["ADMIN", "USER"],
-              actions: ["ADMIN"],
+              amount: ["USER"],
             },
           }}
         />
