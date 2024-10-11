@@ -53,7 +53,7 @@ export default async function WalletLedgerTable({
             columns,
             data,
             totalRecords,
-            pageSizes: [100, 200, 500, 1000],
+            pageSizes: [100, 200, 300, 400, 500, 1000],
             filterOptions: {
               type: {
                 filterTitle: "Ledger Type",
