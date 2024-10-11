@@ -15,7 +15,7 @@ export function cn(...inputs: ClassValue[]) {
 export function getCurrentSortingOrderArray(sortingParams: string[]) {
   const initialArray: SortingState = [];
   const orderByArray = sortingParams.reduce((acc, curr) => {
-    const [key, value] = curr.split("_");
+    const [key, value] = curr.split("-");
 
     const desc = value === "desc" ? true : false;
 
@@ -35,13 +35,6 @@ export function getCurrentSortingOrderParamArray(sortingArray: SortingState) {
     return `${sort.id}-${sort.desc === true ? "desc" : "asc"}`;
   });
 }
-
-export const getIstString = (date: Date) => {
-  if (!date) return "";
-  return DateTime.fromJSDate(date, {
-    zone: "Asia/Kolkata",
-  }).toFormat("yyyy-MM-dd");
-};
 
 export const setStartAndEndOfDay = (date?: DateRange): DateRange => {
   if (!date || !date.from || !date.to)
@@ -207,3 +200,8 @@ export const getUtcTimestampsForSelectedDates = (selectedDates: DateRange) => {
     to: endOfDay.toMillis().toString(),
   };
 };
+
+export const fromDateIstDateTime = (date: Date) =>
+  DateTime.fromJSDate(date, {
+    zone: "Asia/Kolkata",
+  });

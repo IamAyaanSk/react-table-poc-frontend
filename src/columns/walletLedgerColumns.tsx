@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { getIstString } from "@/lib/utils";
+import { fromDateIstDateTime } from "@/lib/utils";
 import { Ledger } from "@prisma/client";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
@@ -11,6 +11,7 @@ export type WalletLedgerTableRecord = Omit<
 >;
 
 const walletLedgerColumnHelper = createColumnHelper<WalletLedgerTableRecord>();
+const TABLE_DATE_TIME_FORMAT = "yyyy-MMM-dd | hh:mm:ss a";
 
 export const columns = [
   walletLedgerColumnHelper.accessor("amount", {
@@ -41,13 +42,12 @@ export const columns = [
   walletLedgerColumnHelper.accessor("dateTime", {
     header: "Date | Time",
     cell: ({ row }) => {
-      const dateObject =
-        typeof row.original.dateTime === "string"
-          ? new Date(row.original.dateTime)
-          : row.original.dateTime;
-      return <p>{getIstString(dateObject)}</p>;
+      const formattedForTooltipAbsolute = fromDateIstDateTime(
+        new Date(row.original.dateTime)
+      ).toFormat(TABLE_DATE_TIME_FORMAT);
+
+      return <p>{formattedForTooltipAbsolute}</p>;
     },
-    enableSorting: false,
   }),
   walletLedgerColumnHelper.accessor("type", {
     header: "Type",
