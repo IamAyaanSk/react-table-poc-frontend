@@ -48,11 +48,6 @@ export default function DataTableSearchBox({
           setInputValue(event.target.value);
           sendSearchQuery(event.target.value);
         }}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            sendSearchQuery(event.currentTarget.value);
-          }
-        }}
       />
       <Button
         variant={"ghost"}
