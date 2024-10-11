@@ -307,9 +307,9 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="m-4 border border-primary px-6 rounded-md pb-6">
-      <div className="flex flex-col gap-2 justify-center pt-6 pb-4">
+      <div className="flex flex-col gap-6 justify-center pt-6 pb-4 sm:gap-2">
         <div
-          className={`flex items-center ${
+          className={`flex items-center flex-wrap gap-2 ${
             showDateRange ? "justify-between" : "justify-end"
           }`}
         >
@@ -324,7 +324,7 @@ export function DataTable<TData, TValue>({
           )}
           <div className={`flex gap-4 items-center`}>
             {allowExport && (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
                 <Button onClick={handleExport} size="sm" className="h-8 flex">
                   <FileSpreadsheet className="mr-2 h-4 w-4" />
                   Export
@@ -340,7 +340,7 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {filterOptions && (
             <>
               {Object.keys(filterOptions).map((key) => {
