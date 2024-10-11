@@ -38,7 +38,7 @@ export default async function WalletLedgerTable({
   return (
     <div>
       {isError ? (
-        <div>
+        <div className="flex flex-col gap-3 justify-center items-center">
           <StateFullPage>
             <AlertTriangle className="w-8 h-8" />
             <h2>{message}</h2>
