@@ -215,11 +215,20 @@ export function DataTable<TData, TValue>({
       for (const key in params) {
         if (!params[key]) delete params[key];
       }
+      // Create new search params string
       const newSearchParams = qs.stringify(params, { arrayFormat: "brackets" });
 
-      startTransition(() => {
-        router.replace(`${pathname}?${newSearchParams}`);
+      // Get the current search params string
+      const currentSearchParams = qs.stringify(searchParams, {
+        arrayFormat: "brackets",
       });
+
+      // Only replace the URL if the new params are different from the current ones
+      if (newSearchParams !== currentSearchParams) {
+        startTransition(() => {
+          router.replace(`${pathname}?${newSearchParams}`);
+        });
+      }
     },
     [router, pathname]
   );
