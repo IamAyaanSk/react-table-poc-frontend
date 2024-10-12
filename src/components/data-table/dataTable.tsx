@@ -81,9 +81,9 @@ interface DataTableProps<TData, TValue> {
     defaultPageSize?: number;
     filterOptions?: OptionalFilterOptions<TData>;
     showDateRange?: boolean;
-    allowExport?: boolean;
+    allowExport?: Partial<Record<string, string[]>> | boolean;
     showViewControlButton?: boolean;
-    hideColumns?: Record<string, string[]>;
+    columnVisibilityConfig?: Record<string, Partial<Record<string, string[]>>>;
     searchBox?:
       | {
           placeHolder: string;
@@ -101,9 +101,9 @@ export function DataTable<TData, TValue>({
     pageSizes,
     defaultPageSize = pageSizes[0],
     showDateRange = true,
-    allowExport = true,
+    allowExport,
     showViewControlButton = true,
-    hideColumns,
+    columnVisibilityConfig,
     searchBox = {
       placeHolder: "Search here..",
     },
@@ -111,7 +111,8 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const memoizedColumns = useMemo(() => columns, [columns]);
 
-  const role = "ADMIN";
+  const userOrganisation = "ADMIN";
+  const userRole = "ADMIN";
 
   // A re-render is most likely to happen when the data changes
   // So, no need to memoize the data
@@ -185,12 +186,24 @@ export function DataTable<TData, TValue>({
 
   let columnVisibilityState: VisibilityState = {};
 
-  if (hideColumns) {
-    columnVisibilityState = Object.keys(hideColumns).reduce((acc, key) => {
-      const hideForRoles = hideColumns[key];
-      if (hideForRoles && hideForRoles.includes(role)) acc[key] = false;
-      return acc;
-    }, {} as VisibilityState);
+  if (columnVisibilityConfig) {
+    columnVisibilityState = Object.keys(columnVisibilityConfig).reduce(
+      (acc, key) => {
+        const allowFor = columnVisibilityConfig[key];
+        const allowedRolesForCurrentOrg =
+          userOrganisation && allowFor[userOrganisation];
+
+        // If a particular organization is not specified in config then the column will be invisible for all roles under that org
+        const isColumnAllowedForUser =
+          userRole &&
+          allowedRolesForCurrentOrg &&
+          allowedRolesForCurrentOrg.includes(userRole);
+
+        if (!isColumnAllowedForUser) acc[key] = false;
+        return acc;
+      },
+      {} as VisibilityState
+    );
   }
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
@@ -304,6 +317,18 @@ export function DataTable<TData, TValue>({
   const handleResetFilter = () => {
     setFilter([]);
   };
+
+  if (allowExport && typeof allowExport === "object") {
+    const allowedRolesForCurrentOrg = userOrganisation
+      ? allowExport[userOrganisation]
+      : null;
+    const isExportAllowedForUser =
+      allowedRolesForCurrentOrg && userRole
+        ? allowedRolesForCurrentOrg.includes(userRole)
+        : false;
+
+    allowExport = isExportAllowedForUser ? allowExport : false;
+  }
 
   return (
     <div className="m-4 border border-primary px-6 rounded-md pb-6">

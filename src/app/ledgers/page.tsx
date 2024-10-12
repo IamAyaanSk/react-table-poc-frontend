@@ -18,21 +18,20 @@ export default async function WalletLedgerTable({
   let message = "Failed to fetch data.";
 
   // Fetch data only if query params avl ( as page and page size are required, it also stops the initial fetch without search params)
-  if (searchParams && Object.keys(searchParams).length > 0) {
-    const response = await fetch(
-      `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
-        arrayFormat: "brackets",
-      })}`
-    );
-    const result = await response.json();
 
-    if (!response.ok) {
-      isError = true;
-      message = `Error: ${response.status} - ${result.error}`;
-    } else {
-      data = result.data;
-      totalRecords = result.totalRecords;
-    }
+  const response = await fetch(
+    `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
+      arrayFormat: "brackets",
+    })}`
+  );
+  const result = await response.json();
+
+  if (!response.ok) {
+    isError = true;
+    message = `Error: ${response.status} - ${result.error}`;
+  } else {
+    data = result.data;
+    totalRecords = result.totalRecords;
   }
 
   return (
@@ -74,8 +73,13 @@ export default async function WalletLedgerTable({
                 ],
               },
             },
-            hideColumns: {
-              amount: ["USER"],
+            columnVisibilityConfig: {
+              amount: {
+                ADMIN: ["ADMIN"],
+              },
+            },
+            allowExport: {
+              ADMIN: ["ADMIN"],
             },
           }}
         />
