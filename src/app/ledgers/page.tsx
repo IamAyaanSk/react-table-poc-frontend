@@ -72,7 +72,7 @@ export default async function WalletLedgerTable({
                 ],
               },
             },
-            showDateRange: false,
+
             columnVisibilityConfig: {
               amount: {
                 ADMIN: ["ADMIN"],
