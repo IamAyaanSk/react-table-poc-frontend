@@ -23,6 +23,8 @@ export default async function WalletLedgerTable({
     })}`
   );
   const result = await response.json();
+  console.log("Data fetched", result);
+  console.log("Search Params", searchParams);
 
   if (!response.ok) {
     isError = true;

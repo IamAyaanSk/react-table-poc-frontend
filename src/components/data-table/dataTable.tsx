@@ -230,7 +230,7 @@ export function DataTable<TData, TValue>({
         });
       }
     },
-    [router, pathname]
+    [router, pathname, searchParams]
   );
 
   const debouncedSetQueryParams = useDebounce(setQueryParams, 500);
@@ -282,6 +282,7 @@ export function DataTable<TData, TValue>({
     filter,
     dateRange,
     searchQuery,
+    showDateRange,
     debouncedSetQueryParams,
   ]);
 
