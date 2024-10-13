@@ -18,20 +18,6 @@ export default async function WalletLedgerTable({
   let isError = false;
   let message = "Failed to fetch data.";
 
-  // Add default filters
-  if (!searchParams || Object.keys(searchParams).length === 0) {
-    const todayDates = getUtcTimestampsForSelectedDates({
-      from: new Date(),
-      to: new Date(),
-    });
-    searchParams = {
-      page: "1",
-      pageSize: "300",
-      startDate: todayDates.from,
-      endDate: todayDates.to,
-    };
-  }
-
   const response = await fetch(
     `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
       arrayFormat: "brackets",
@@ -87,6 +73,7 @@ export default async function WalletLedgerTable({
                 ],
               },
             },
+            showDateRange: false,
             columnVisibilityConfig: {
               amount: {
                 ADMIN: ["ADMIN"],
