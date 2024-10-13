@@ -6,7 +6,6 @@ import { AlertTriangle } from "lucide-react";
 import { StateFullPage } from "@/components/statefullPage";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getUtcTimestampsForSelectedDates } from "@/lib/utils";
 
 export default async function WalletLedgerTable({
   searchParams,
