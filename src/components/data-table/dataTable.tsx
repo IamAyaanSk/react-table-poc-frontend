@@ -5,7 +5,9 @@ import {
   DeepKeys,
   flexRender,
   getCoreRowModel,
+  RowData,
   SortingState,
+  TableMeta,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
@@ -52,6 +54,13 @@ import { Separator } from "@/components/ui/separator";
 import useDebounce from "@/hooks/useDebounce";
 import qs from "qs";
 
+declare module "@tanstack/react-table" {
+  // eslint-disable-next-line
+  interface TableMeta<TData extends RowData> {
+    remitterMobileNumber?: string;
+  }
+}
+
 type OptionalFilterOptions<T> = {
   [K in DeepKeys<T>]?: FilterOptionsConfig;
 };
@@ -77,8 +86,6 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     totalRecords: number;
-    pageSizes: number[];
-    defaultPageSize?: number;
     filterOptions?: OptionalFilterOptions<TData>;
     showDateRange?: boolean;
     allowExport?: Partial<Record<string, string[]>> | boolean;
@@ -89,6 +96,7 @@ interface DataTableProps<TData, TValue> {
           placeHolder: string;
         }
       | false;
+    meta?: TableMeta<TData>;
   };
 }
 
@@ -98,8 +106,6 @@ export function DataTable<TData, TValue>({
     data,
     totalRecords,
     filterOptions,
-    pageSizes,
-    defaultPageSize = pageSizes[0],
     showDateRange = true,
     allowExport,
     showViewControlButton = true,
@@ -107,8 +113,10 @@ export function DataTable<TData, TValue>({
     searchBox = {
       placeHolder: "Search here..",
     },
+    meta,
   },
 }: DataTableProps<TData, TValue>) {
+  const pageSizes = [200, 400, 600, 800, 1000];
   const memoizedColumns = useMemo(() => columns, [columns]);
 
   const userOrganisation = "ADMIN";
@@ -129,7 +137,7 @@ export function DataTable<TData, TValue>({
 
   const pageSizeQueryParam = searchParams.get("pageSize");
   const [pageSize, setPageSize] = useState(
-    pageSizeQueryParam ? parseInt(pageSizeQueryParam) : defaultPageSize
+    pageSizeQueryParam ? parseInt(pageSizeQueryParam) : pageSizes[0]
   );
 
   const [sorting, setSorting] = useState<SortingState>(
@@ -303,6 +311,7 @@ export function DataTable<TData, TValue>({
       columnFilters: filter,
       columnVisibility,
     },
+    meta,
     onColumnVisibilityChange: setColumnVisibility,
   });
 

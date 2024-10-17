@@ -1,10 +1,10 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import WalletLedgerAction from "@/components/walletLedgerActionComponent";
 import { fromDateIstDateTime } from "@/lib/utils";
 import { Ledger } from "@prisma/client";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import Link from "next/link";
 
 export type WalletLedgerTableRecord = Omit<
   Ledger,
@@ -116,17 +116,10 @@ export const columns = [
   walletLedgerColumnHelper.display({
     header: "Actions",
     id: "actions",
-    cell: ({ row }) => {
-      return (
-        <button
-          className="text-primary flex items-center justify-center"
-          onClick={() => {
-            console.log("View", row.original);
-          }}
-        >
-          <Link href={"/ledgers"}>View</Link>
-        </button>
-      );
+    cell: ({ row, table }) => {
+      const metaData = table.options.meta?.remitterMobileNumber;
+      if (!metaData) return null;
+      return <WalletLedgerAction remitterMobileNumber={metaData} row={row} />;
     },
     size: 80,
     enableSorting: false,

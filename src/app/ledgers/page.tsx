@@ -23,7 +23,7 @@ export default async function WalletLedgerTable({
     })}`
   );
   const result = await response.json();
-  console.log("Data fetched", result);
+  console.log("Data fetched", result, response.statusText, response.status);
   console.log("Search Params", searchParams);
 
   if (!response.ok) {
@@ -52,8 +52,10 @@ export default async function WalletLedgerTable({
             columns,
             data,
             totalRecords,
-            pageSizes: [100, 200, 300, 400, 500, 1000],
-            defaultPageSize: 300,
+            meta: {
+              remitterMobileNumber: "1234567890",
+            },
+
             filterOptions: {
               type: {
                 filterTitle: "Ledger Type",
