@@ -523,7 +523,10 @@ export function DataTable<TData, TValue>({
               {table.getFooterGroups().map((footerGroup) => (
                 <TableRow key={footerGroup.id}>
                   {footerGroup.headers.map((header) => (
-                    <TableCell className="text-center" key={header.id}>
+                    <TableCell
+                      className="text-center border-none"
+                      key={header.id}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
