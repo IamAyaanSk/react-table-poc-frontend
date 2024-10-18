@@ -22,12 +22,25 @@ export const columns = [
       return <p className="text-right mr-4">₹{amount}</p>;
     },
     footer: ({ table }) => {
-      const totalAmount = table.options.meta?.totalAmount;
-      if (!totalAmount) return null;
+      const totalCreditAmount = table.options.meta?.totalCreditAmount || 0;
+      const totalDebitAmount = table.options.meta?.totalDebitAmount || 0;
+
       return (
-        <p className="text-right mr-4 p-2 font-bold">{`₹${totalAmount.toFixed(
-          2
-        )}`}</p>
+        <>
+          <p className="mr-4 p-2 font-bold text-left text-green-600">
+            CREDIT:
+            <span className="text-right text-black">{` ₹${totalCreditAmount.toFixed(
+              2
+            )}`}</span>
+          </p>
+
+          <p className="mr-4 p-2 font-bold text-left text-red-600">
+            DEBIT:
+            <span className="text-right text-black">{` ₹${totalDebitAmount.toFixed(
+              2
+            )}`}</span>
+          </p>
+        </>
       );
     },
     size: 60,

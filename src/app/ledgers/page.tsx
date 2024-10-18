@@ -16,7 +16,8 @@ export default async function WalletLedgerTable({
   let totalRecords = 0;
   let isError = false;
   let message = "Failed to fetch data.";
-  let totalAmount;
+  let totalCreditAmount;
+  let totalDebitAmount;
 
   const response = await fetch(
     `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
@@ -36,7 +37,8 @@ export default async function WalletLedgerTable({
   } else {
     data = result.data;
     totalRecords = result.totalRecords;
-    totalAmount = result.totalAmount;
+    totalCreditAmount = result.totalCreditAmount;
+    totalDebitAmount = result.totalDebitAmount;
   }
 
   return (
@@ -59,7 +61,8 @@ export default async function WalletLedgerTable({
             totalRecords,
             meta: {
               remitterMobileNumber: "1234567890",
-              totalAmount,
+              totalDebitAmount,
+              totalCreditAmount,
             },
 
             filterOptions: {

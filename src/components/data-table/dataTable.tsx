@@ -59,7 +59,8 @@ declare module "@tanstack/react-table" {
   // eslint-disable-next-line
   interface TableMeta<TData extends RowData> {
     remitterMobileNumber?: string;
-    totalAmount: number;
+    totalCreditAmount: number;
+    totalDebitAmount: number;
   }
 }
 
@@ -517,22 +518,24 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
 
-          <TableFooter>
-            {table.getFooterGroups().map((footerGroup) => (
-              <TableRow key={footerGroup.id}>
-                {footerGroup.headers.map((header) => (
-                  <TableCell className="text-center" key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.footer,
-                          header.getContext()
-                        )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableFooter>
+          {data.length > 0 && (
+            <TableFooter>
+              {table.getFooterGroups().map((footerGroup) => (
+                <TableRow key={footerGroup.id}>
+                  {footerGroup.headers.map((header) => (
+                    <TableCell className="text-center" key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.footer,
+                            header.getContext()
+                          )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableFooter>
+          )}
         </Table>
       </div>
 
