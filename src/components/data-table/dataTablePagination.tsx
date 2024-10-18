@@ -43,7 +43,7 @@ export default function DataTablePagination<TData>({
   };
   return (
     <div className="flex items-center justify-between px-2 flex-wrap">
-      <div className="flex-1 min-w-max text-xs text-muted-foreground">
+      <div className="flex-1 text-xs text-muted-foreground">
         {table.getRowCount()} row(s) in total.
       </div>
       <div className="flex items-center gap-4 flex-wrap">

@@ -448,7 +448,7 @@ export function DataTable<TData, TValue>({
         <Table
           ref={tableRef}
           style={{
-            width: table.getCenterTotalSize(),
+            minWidth: table.getCenterTotalSize(),
           }}
         >
           <TableHeader>

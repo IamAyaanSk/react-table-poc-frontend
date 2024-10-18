@@ -106,6 +106,7 @@ export const columns = [
       const service = row.original.service;
       return <p>{service}</p>;
     },
+
     enableSorting: false,
   }),
   walletLedgerColumnHelper.accessor("transferredTo", {
