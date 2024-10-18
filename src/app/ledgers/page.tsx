@@ -22,10 +22,7 @@ export default async function WalletLedgerTable({
   const response = await fetch(
     `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
       arrayFormat: "brackets",
-    })}`,
-    {
-      cache: "no-store",
-    }
+    })}`
   );
   const result = await response.json();
   console.log("Data fetched", result, response.statusText, response.status);
