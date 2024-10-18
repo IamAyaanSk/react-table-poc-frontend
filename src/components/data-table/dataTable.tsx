@@ -19,6 +19,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter,
 } from "@/components/ui/table";
 
 import { useRouter } from "next/navigation";
@@ -58,6 +59,7 @@ declare module "@tanstack/react-table" {
   // eslint-disable-next-line
   interface TableMeta<TData extends RowData> {
     remitterMobileNumber?: string;
+    totalAmount: number;
   }
 }
 
@@ -514,6 +516,23 @@ export function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
+
+          <TableFooter>
+            {table.getFooterGroups().map((footerGroup) => (
+              <TableRow key={footerGroup.id}>
+                {footerGroup.headers.map((header) => (
+                  <TableCell className="text-center" key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.footer,
+                          header.getContext()
+                        )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableFooter>
         </Table>
       </div>
 

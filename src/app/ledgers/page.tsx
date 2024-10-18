@@ -16,11 +16,15 @@ export default async function WalletLedgerTable({
   let totalRecords = 0;
   let isError = false;
   let message = "Failed to fetch data.";
+  let totalAmount;
 
   const response = await fetch(
     `${API_PATHS.LEDGERS}/?${qs.stringify(searchParams, {
       arrayFormat: "brackets",
-    })}`
+    })}`,
+    {
+      cache: "no-store",
+    }
   );
   const result = await response.json();
   console.log("Data fetched", result, response.statusText, response.status);
@@ -32,6 +36,7 @@ export default async function WalletLedgerTable({
   } else {
     data = result.data;
     totalRecords = result.totalRecords;
+    totalAmount = result.totalAmount;
   }
 
   return (
@@ -54,6 +59,7 @@ export default async function WalletLedgerTable({
             totalRecords,
             meta: {
               remitterMobileNumber: "1234567890",
+              totalAmount,
             },
 
             filterOptions: {

@@ -21,6 +21,15 @@ export const columns = [
       const amount = row.original.amount;
       return <p className="text-right mr-4">₹{amount}</p>;
     },
+    footer: ({ table }) => {
+      const totalAmount = table.options.meta?.totalAmount;
+      if (!totalAmount) return null;
+      return (
+        <p className="text-right mr-4 p-2 font-bold">{`₹${totalAmount.toFixed(
+          2
+        )}`}</p>
+      );
+    },
     size: 60,
     enableHiding: false,
   }),
