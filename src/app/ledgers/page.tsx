@@ -25,8 +25,6 @@ export default async function WalletLedgerTable({
     })}`
   );
   const result = await response.json();
-  console.log("Data fetched", result, response.statusText, response.status);
-  console.log("Search Params", searchParams);
 
   if (!response.ok) {
     isError = true;
@@ -53,8 +51,8 @@ export default async function WalletLedgerTable({
       ) : (
         <DataTable
           config={{
-            columns,
-            data,
+            columns: columns,
+            data: data,
             totalRecords,
             meta: {
               remitterMobileNumber: "1234567890",

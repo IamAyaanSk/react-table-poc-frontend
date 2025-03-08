@@ -21,6 +21,9 @@ const addDataTablePageParams = (url: URL) => {
 };
 
 export default async function middleWareFunc(req: NextRequest) {
+  if (req.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/ledgers", req.nextUrl.origin));
+  }
   // Add date params to specific routes
   const routesNeedingDateParams: string[] = [];
 
@@ -30,7 +33,7 @@ export default async function middleWareFunc(req: NextRequest) {
   if (routesNeedingDateParams.includes(req.nextUrl.pathname)) {
     const { searchParams } = req.nextUrl;
 
-    if (!searchParams.get("startDate") && !searchParams.get("endDate")) {
+    if (!searchParams.get("startDate") || !searchParams.get("endDate")) {
       return NextResponse.redirect(addDateParams(new URL(req.nextUrl.href)));
     }
   }
@@ -38,7 +41,7 @@ export default async function middleWareFunc(req: NextRequest) {
   if (dataTableRoutesWithoutDateParams.includes(req.nextUrl.pathname)) {
     const { searchParams } = req.nextUrl;
 
-    if (!searchParams.get("page") && !searchParams.get("pageSize")) {
+    if (!searchParams.get("page") || !searchParams.get("pageSize")) {
       return NextResponse.redirect(
         addDataTablePageParams(new URL(req.nextUrl.href))
       );
@@ -48,7 +51,7 @@ export default async function middleWareFunc(req: NextRequest) {
   if (dataTableRoutesNeedingDateParams.includes(req.nextUrl.pathname)) {
     const { searchParams } = req.nextUrl;
 
-    if (!searchParams.get("startDate") && !searchParams.get("endDate")) {
+    if (!searchParams.get("startDate") || !searchParams.get("endDate")) {
       const urlWithPageParams = addDataTablePageParams(
         new URL(req.nextUrl.href)
       );

@@ -122,6 +122,8 @@ export function DataTable<TData, TValue>({
   const pageSizes = [200, 400, 600, 800, 1000];
   const memoizedColumns = useMemo(() => columns, [columns]);
 
+  const hasMounted = useRef(false);
+
   const userOrganisation = "ADMIN";
   const userRole = "ADMIN";
 
@@ -269,6 +271,11 @@ export function DataTable<TData, TValue>({
   }, [isPending]);
 
   useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
     const filterQueryParams = filter.reduce((acc, curr) => {
       const filterName = curr.name || curr.id;
       acc[filterName] = curr.value;
@@ -326,7 +333,7 @@ export function DataTable<TData, TValue>({
           toast.error("Failed to export data");
           return;
         }
-        saveAs(file, `aipay-data-export-${Date.now()}.xlsx`);
+        saveAs(file, `acme-data-export-${Date.now()}.xlsx`);
         console.log(file);
       } else {
         toast.error("No data to export");

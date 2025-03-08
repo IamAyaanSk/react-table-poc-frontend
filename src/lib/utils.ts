@@ -25,7 +25,6 @@ export function getCurrentSortingOrderState(sortingParams: string[]) {
 
     return acc;
   }, initialArray);
-
   return orderByArray;
 }
 
