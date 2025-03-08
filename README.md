@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## React table POC
 
-## Getting Started
+This is a basic POC which I developed as a proof of concept when we wanted a table component which implements server side functionalities including sorting, searching, filtering, pagination, total records and dynamic page sizes.
 
-First, run the development server:
+-------------
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- A really dynamic and configurable DataTable component which supports server side table features.
+- Provided an easy config option to control visibility of various columns based on  various roles.
+- Created a Date range filter to allow user select data within a range.
+- Provided cap to restrict past data lookup upto certain period on both backend and frontend.
+- Also added a cap on maximum selectable range on both backend and frontend.
+- Added dynamic facet filters for enum values.
+- Added a summary row to display computed data using Table Meta provided by React Table.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+-------------
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech
+- Nextjs
+- React
+- Postgres
+- Prisma
+- Nodejs
+- Express
+- Zod
+- Qs
+- React Table
+- Shadcn
+- Render ( Please wait for initial request when using live URL as the backend is hosted on free tier )
+- Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-------------
 
-## Learn More
+## How it improved performance 
 
-To learn more about Next.js, take a look at the following resources:
+After I integrated this, the following results were obtained
+- Initially every table functionality was done at client side, moving it to server the app ultimately became highly scalable.
+- We reduced bandwidth usage significantly as only the filtered, paginated data is fetched from the d=server.
+- The app performance increased as the calculations were no longer done on the client side.
+- Developed a better and more consistent and responsive User Interface.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Author
+### Ayaan
