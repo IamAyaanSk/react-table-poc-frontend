@@ -39,5 +39,10 @@ After I integrated this, the following results were obtained
 - The app performance increased as the calculations were no longer done on the client side.
 - Developed a better and more consistent and responsive User Interface.
 
+-------------
+
+## Note
+The backend repository for this project is private due to security and privacy reasons.
+
 ## Author
 ### Ayaan
